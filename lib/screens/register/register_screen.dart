@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _login() {
+  void _register() {
     if (_formKey.currentState!.validate()) {
-      // In a real app, you would verify credentials here
+      // In a real app, you would register the user here
+      // Navigate to home page after successful registration
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     }
   }
@@ -31,6 +36,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -57,17 +66,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Wandelwijs',
+                          'Registreren',
                           style: TextStyle(
                             fontFamily: 'RetroChild',
-                            fontSize: 48,
+                            fontSize: 40,
                             fontWeight: FontWeight.bold,
                             color: Colors.green[800],
                           ),
                         ),
                         const SizedBox(height: 8),
                         const Text(
-                          'Wandelen wordt een avontuur',
+                          'Maak een nieuw account aan',
                           style: TextStyle(
                             fontFamily: 'Feijoada',
                             fontSize: 16,
@@ -75,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 24),
                         TextFormField(
                           controller: _usernameController,
                           decoration: const InputDecoration(
@@ -86,6 +95,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Voer een gebruikersnaam in';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: const InputDecoration(
+                            labelText: 'E-mailadres',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.email),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Voer een e-mailadres in';
+                            }
+                            if (!value.contains('@')) {
+                              return 'Voer een geldig e-mailadres in';
                             }
                             return null;
                           },
@@ -103,6 +130,28 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (value == null || value.isEmpty) {
                               return 'Voer een wachtwoord in';
                             }
+                            if (value.length < 6) {
+                              return 'Wachtwoord moet minimaal 6 tekens bevatten';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _confirmPasswordController,
+                          decoration: const InputDecoration(
+                            labelText: 'Bevestig wachtwoord',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.lock),
+                          ),
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Bevestig je wachtwoord';
+                            }
+                            if (value != _passwordController.text) {
+                              return 'Wachtwoorden komen niet overeen';
+                            }
                             return null;
                           },
                         ),
@@ -111,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed: _login,
+                            onPressed: _register,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green[800],
                               foregroundColor: Colors.white,
@@ -120,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             child: const Text(
-                              'INLOGGEN',
+                              'REGISTREREN',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -131,34 +180,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 16),
                         TextButton(
                           onPressed: () {
-                            // Handle forgot password
+                            Navigator.pushReplacementNamed(context, AppRoutes.login);
                           },
-                          child: const Text('Wachtwoord vergeten?'),
-                        ),
-                        const Divider(),
-                        const SizedBox(height: 8),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: OutlinedButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, AppRoutes.register);
-                            },
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Colors.green[800]!),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              'REGISTREREN',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green[800],
-                              ),
-                            ),
-                          ),
+                          child: const Text('Al een account? Inloggen'),
                         ),
                       ],
                     ),

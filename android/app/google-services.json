@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "291004521217",
+    "project_id": "wandelwijs-45f1a",
+    "storage_bucket": "wandelwijs-45f1a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291004521217:android:0e025b586c5fe601155900",
+        "android_client_info": {
+          "package_name": "com.example.wandelwijs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAzZT6QJBKB61E_AFEYlHFw3V0vBIW0yY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

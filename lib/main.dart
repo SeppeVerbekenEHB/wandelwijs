@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'routes/app_routes.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/register/register_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       home: const LoginScreen(),
       routes: {
         AppRoutes.login: (context) => const LoginScreen(),
+        AppRoutes.register: (context) => const RegisterScreen(),
         AppRoutes.home: (context) => const HomeScreen(),
       },
     );
