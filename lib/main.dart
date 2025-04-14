@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        fontFamily: 'RetroChild', // Set default font family
       ),
       home: const HomePage(),
     );
@@ -26,43 +27,46 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true, // Extend the body behind the app bar
-      appBar: AppBar(
-        title: const Text('WandelWijs'),
-        backgroundColor: Colors.transparent, // Make app bar transparent
-        elevation: 0, // Remove app bar shadow
-      ),
+      extendBodyBehindAppBar: true,
       body: Container(
-        width: double.infinity, // Ensure full width
-        height: double.infinity, // Ensure full height
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/Seamlessbackground.png'),
             fit: BoxFit.cover,
           ),
         ),
-        child: SafeArea(
+        child: Center(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Welcome to WandelWijs!',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+            child: Transform.translate(
+              offset: const Offset(0, -100), // Move up by 50 pixels
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Wandelwijs',
+                    style: TextStyle(
+                      fontFamily: 'RetroChild',
+                      fontSize: 60,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green[800],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Your hiking companion app',
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                // Add your additional content here
-              ],
+                  const SizedBox(height: 0),
+                  const Text(
+                    'Wandelen wordt een avontuur',
+                    style: TextStyle(
+                      fontFamily: 'Feijoada',
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  )
+                ],
+              ),
             ),
           ),
         ),
