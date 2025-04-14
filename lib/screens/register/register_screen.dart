@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../screens/auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -14,6 +16,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+
+  String? _errorMessage = '';
+  bool isLogin = true;
+
+
+  Future<void> createUserWithEmailAndPassword() async {
+    try {
+      await Auth().createUserWithEmailAndPassword(_emailController.text, _passwordController.text);
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+    }
+  }
 
   @override
   void dispose() {

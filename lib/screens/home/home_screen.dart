@@ -1,8 +1,31 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
+import '../../screens/auth.dart';
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  User? _getUser() {
+    return Auth().currentUser;
+  }
+
+  Future<void> signOut() async {
+    await Auth().signOut();
+  }
+
+  Widget _userUid() {
+    final user = _getUser();
+    return Text(user?.email ?? 'User email');
+  }
+
+  Widget _signOutButton() {
+    return ElevatedButton(
+      onPressed: signOut,
+      child: const Text('Sign Out'),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +56,13 @@ class HomeScreen extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Transform.translate(
-              offset: const Offset(0, -100), // Move up by 100 pixels
+              offset: const Offset(0, -100),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
+                children: <Widget>[
+                  _userUid(),
+                  _signOutButton(),
                   Text(
                     'Wandelwijs',
                     style: TextStyle(

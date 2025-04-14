@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../screens/auth.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,6 +15,21 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+
+
+  String? _errorMessage = '';
+  bool isLogin = true;
+
+  Future<void> signInWithEmailAndPassword() async{
+    try{
+      await Auth().signInWithEmailAndPassword(_usernameController.text, _passwordController.text);
+    } on FirebaseAuthException catch (e){
+      setState((){
+        _errorMessage = e.message;
+      });
+    }
+  }
 
   @override
   void dispose() {
