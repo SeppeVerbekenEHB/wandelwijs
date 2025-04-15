@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../screens/auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,6 +17,89 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  String? errorMessage = '';
+  bool isLogin = true;
+
+  // Define reusable widgets
+  Widget _entryField(
+    String title,
+    TextEditingController controller,
+    {bool isPassword = false, 
+    IconData? icon,
+    String? Function(String?)? validator}
+  ){
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: title,
+        border: OutlineInputBorder(),
+        prefixIcon: icon != null ? Icon(icon) : null,
+      ),
+      obscureText: isPassword,
+      validator: validator,
+    );
+  }
+
+  Widget _errorMessage(){
+    return Text(
+      errorMessage == '' ? '' : 'Fout: $_errorMessage',
+      style: TextStyle(color: Colors.red),
+    );
+  }
+
+  Widget _submitButton(String text, VoidCallback onPressed, {bool isPrimary = true}) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: isPrimary 
+        ? ElevatedButton(
+            onPressed: onPressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[800],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          )
+        : OutlinedButton(
+            onPressed: onPressed,
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: Colors.green[800]!),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[800],
+              ),
+            ),
+          ),
+    );
+  }
+
+  Future<void> createUserWithEmailAndPassword() async {
+    try {
+      await Auth().createUserWithEmailAndPassword(_emailController.text, _passwordController.text);
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+  }
+
   @override
   void dispose() {
     _usernameController.dispose();
@@ -26,9 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _register() {
     if (_formKey.currentState!.validate()) {
-      // In a real app, you would register the user here
-      // Navigate to home page after successful registration
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      createUserWithEmailAndPassword();
     }
   }
 
@@ -84,14 +167,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 24),
-                        TextFormField(
-                          controller: _usernameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Gebruikersnaam',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.person),
-                          ),
+                        const SizedBox(height: 10),
+                        _errorMessage(),
+                        const SizedBox(height: 5),
+                        _entryField(
+                          'Gebruikersnaam',
+                          _usernameController,
+                          icon: Icons.person,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Voer een gebruikersnaam in';
@@ -100,13 +182,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'E-mailadres',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.email),
-                          ),
+                        _entryField(
+                          'E-mailadres',
+                          _emailController,
+                          icon: Icons.email,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Voer een e-mailadres in';
@@ -118,14 +197,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _passwordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Wachtwoord',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.lock),
-                          ),
-                          obscureText: true,
+                        _entryField(
+                          'Wachtwoord',
+                          _passwordController,
+                          isPassword: true,
+                          icon: Icons.lock,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Voer een wachtwoord in';
@@ -137,14 +213,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _confirmPasswordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Bevestig wachtwoord',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.lock),
-                          ),
-                          obscureText: true,
+                        _entryField(
+                          'Bevestig wachtwoord',
+                          _confirmPasswordController,
+                          isPassword: true,
+                          icon: Icons.lock,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Bevestig je wachtwoord';
@@ -156,27 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
                         const SizedBox(height: 24),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: _register,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green[800],
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'REGISTREREN',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
+                        _submitButton('REGISTREREN', _register),
                         const SizedBox(height: 16),
                         TextButton(
                           onPressed: () {
