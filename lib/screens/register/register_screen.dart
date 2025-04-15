@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../screens/auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Add Firestore import
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -42,8 +43,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _errorMessage(){
     return Text(
-      errorMessage == '' ? '' : 'Fout: $_errorMessage',
-      style: TextStyle(color: Colors.red),
+      errorMessage == '' ? '' : 'Fout: $errorMessage',
+      style: const TextStyle(color: Colors.red),
     );
   }
 
@@ -91,11 +92,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> createUserWithEmailAndPassword() async {
     try {
-      await Auth().createUserWithEmailAndPassword(_emailController.text, _passwordController.text);
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      // Create authentication user (don't capture return value)
+      await Auth().createUserWithEmailAndPassword(
+          _emailController.text, _passwordController.text);
+      
+      // Get the user ID from current user
+      String uid = FirebaseAuth.instance.currentUser!.uid;
+      
+      try {
+        // Create user document in Firestore
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          'uuid': uid,
+          'username': _usernameController.text,
+          'email': _emailController.text,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      } catch (firestoreError) {
+        print("Firestore error: $firestoreError");
+        setState(() {
+          errorMessage = "Account created but profile setup failed: $firestoreError";
+        });
+        // Still navigate to home since authentication succeeded
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = "Failed to create user: $e";
       });
     }
   }
