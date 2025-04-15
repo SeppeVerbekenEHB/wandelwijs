@@ -31,9 +31,7 @@ class _WidgetTreeState extends State<WidgetTree>{
                         body: Center(child: CircularProgressIndicator()),
                     );
                 }
-                
-                // Debug information to check authentication state
-                print('Auth state updated: ${snapshot.hasData ? 'User is logged in' : 'User is NOT logged in'}');
+                // Check if the user is logged in
                 if (snapshot.hasData){
                     print('Navigating to HomeScreen - User ID: ${snapshot.data?.uid}');
                     return const HomeScreen();

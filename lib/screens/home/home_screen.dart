@@ -15,11 +15,9 @@ class HomeScreen extends StatelessWidget {
     try {
       await Auth().signOut();
       // Navigate to login page after successful sign out
-      // ignore: use_build_context_synchronously
       Navigator.pushReplacementNamed(context, AppRoutes.login);
     } catch (e) {
       print('Error signing out: $e');
-      // Optionally show an error message to the user
     }
   }
 

@@ -21,17 +21,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> signInWithEmailAndPassword() async {
     setState(() {
-      _isLoading = true;  // Show loading indicator
-      errorMessage = '';  // Clear any previous error messages
+      _isLoading = true;
+      errorMessage = '';
     });
     
     try {
       await Auth().signInWithEmailAndPassword(_usermailController.text, _passwordController.text);
-      // Login successful - the widget_tree will automatically navigate to HomeScreen
-      print('Login successful - waiting for auth state change');
-      
+
       // If auth succeeds but widget_tree doesn't redirect quickly enough, 
-      // we can add a small delay and manual navigation as fallback
+      // Add a small delay and manual navigation as fallback
       await Future.delayed(const Duration(seconds: 1));
       if (mounted && Auth().currentUser != null) {
         Navigator.of(context).pushReplacementNamed(AppRoutes.home);

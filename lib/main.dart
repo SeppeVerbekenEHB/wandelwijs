@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'RetroChild', // Set default font family
       ),
-      // Use home instead of initialRoute to avoid route issues
       home: const WidgetTree(),
       routes: {
         AppRoutes.login: (context) => const LoginScreen(),
