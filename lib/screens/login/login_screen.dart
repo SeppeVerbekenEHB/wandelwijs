@@ -12,7 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _usernameController = TextEditingController();
+  final _usermailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> signInWithEmailAndPassword() async{
     try{
-      await Auth().signInWithEmailAndPassword(_usernameController.text, _passwordController.text);
+      await Auth().signInWithEmailAndPassword(_usermailController.text, _passwordController.text);
     } on FirebaseAuthException catch (e){
       setState((){
         _errorMessage = e.message;
@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _usermailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -95,15 +95,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 32),
                         TextFormField(
-                          controller: _usernameController,
+                          controller: _usermailController,
                           decoration: const InputDecoration(
-                            labelText: 'Gebruikersnaam',
+                            labelText: 'e-mail',
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.person),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Voer een gebruikersnaam in';
+                              return 'Voer je mail adres in';
+                            }
+                            if (!value.contains('@')) {
+                              return 'Voer een geldig e-mailadres in';
                             }
                             return null;
                           },
