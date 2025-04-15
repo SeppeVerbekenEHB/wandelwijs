@@ -4,6 +4,7 @@ import 'screens/login/login_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/register/register_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'screens/widget_tree.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'RetroChild', // Set default font family
       ),
       // Use home instead of initialRoute to avoid route issues
-      home: const LoginScreen(),
+      home: const WidgetTree(),
       routes: {
         AppRoutes.login: (context) => const LoginScreen(),
         AppRoutes.register: (context) => const RegisterScreen(),

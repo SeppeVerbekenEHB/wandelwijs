@@ -3,7 +3,6 @@ import '../../routes/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../screens/auth.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -16,19 +15,109 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-
-
-  String? _errorMessage = '';
+  String? errorMessage = '';
   bool isLogin = true;
+  bool _isLoading = false;
 
-  Future<void> signInWithEmailAndPassword() async{
-    try{
+  Future<void> signInWithEmailAndPassword() async {
+    setState(() {
+      _isLoading = true;  // Show loading indicator
+      errorMessage = '';  // Clear any previous error messages
+    });
+    
+    try {
       await Auth().signInWithEmailAndPassword(_usermailController.text, _passwordController.text);
-    } on FirebaseAuthException catch (e){
-      setState((){
-        _errorMessage = e.message;
+      // Login successful - the widget_tree will automatically navigate to HomeScreen
+      print('Login successful - waiting for auth state change');
+      
+      // If auth succeeds but widget_tree doesn't redirect quickly enough, 
+      // we can add a small delay and manual navigation as fallback
+      await Future.delayed(const Duration(seconds: 1));
+      if (mounted && Auth().currentUser != null) {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
       });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;  // Hide loading indicator when done
+        });
+      }
     }
+  }
+
+  Widget _entryField(
+    String title,
+    TextEditingController controller,
+    {bool isPassword = false, 
+    IconData? icon,
+    String? Function(String?)? validator}
+  ){
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: title,
+        border: OutlineInputBorder(),
+        prefixIcon: icon != null ? Icon(icon) : null,
+      ),
+      obscureText: isPassword,
+      validator: validator,
+    );
+  }
+
+  Widget _errorMessage(){
+    return Text(
+      errorMessage == '' ? '' : 'Hmmmm? $errorMessage',
+      style: TextStyle(color: Colors.red),
+    );
+  }
+
+  Widget _submitButton(String text, VoidCallback onPressed, {bool isPrimary = true}) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: _isLoading 
+        ? const Center(child: CircularProgressIndicator())
+        : (isPrimary 
+          ? ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[800],
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          : OutlinedButton(
+              onPressed: onPressed,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: Colors.green[800]!),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green[800],
+                ),
+              ),
+            )
+        ),
+    );
   }
 
   @override
@@ -40,8 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() {
     if (_formKey.currentState!.validate()) {
-      // In a real app, you would verify credentials here
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      signInWithEmailAndPassword();
     }
   }
 
@@ -93,14 +181,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 32),
-                        TextFormField(
-                          controller: _usermailController,
-                          decoration: const InputDecoration(
-                            labelText: 'e-mail',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.person),
-                          ),
+                        const SizedBox(height: 10),
+                        _errorMessage(),
+                        const SizedBox(height: 5),
+                        _entryField(
+                          'e-mail',
+                          _usermailController,
+                          icon: Icons.person,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Voer je mail adres in';
@@ -112,14 +199,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _passwordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Wachtwoord',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.lock),
-                          ),
-                          obscureText: true,
+                        _entryField(
+                          'Wachtwoord',
+                          _passwordController,
+                          isPassword: true,
+                          icon: Icons.lock,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Voer een wachtwoord in';
@@ -128,27 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
                         const SizedBox(height: 24),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: _login,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green[800],
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'INLOGGEN',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
+                        _submitButton('InLoggen', _login),
                         const SizedBox(height: 16),
                         TextButton(
                           onPressed: () {
@@ -158,28 +222,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const Divider(),
                         const SizedBox(height: 8),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: OutlinedButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, AppRoutes.register);
-                            },
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Colors.green[800]!),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              'REGISTREREN',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green[800],
-                              ),
-                            ),
-                          ),
+                        _submitButton(
+                          'REGISTREREN', 
+                          () {
+                            Navigator.pushNamed(context, AppRoutes.register);
+                          },
+                          isPrimary: false,
                         ),
                       ],
                     ),
