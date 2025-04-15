@@ -1,17 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Auth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  
-  // Constructor to configure persistence
+
   Auth() {
-    // Try to set persistence to LOCAL - this will persist the user's login state 
-    // across app restarts until they explicitly sign out
-    try {
+    // Only set persistence on web platforms
+    if (kIsWeb) {
       _firebaseAuth.setPersistence(Persistence.LOCAL);
-      print("Firebase persistence set to LOCAL");
-    } catch (e) {
-      print("Error setting persistence: $e");
     }
   }
 
@@ -19,21 +15,16 @@ class Auth {
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
-  Future<UserCredential> signInWithEmailAndPassword(
-      String email, String password) async {
-    print("Attempting login with email: $email");
-    final result = await _firebaseAuth.signInWithEmailAndPassword(
+  Future<void> signInWithEmailAndPassword(String email, String password) async {
+    await _firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
-    print("Login successful for user: ${result.user?.uid}");
-    return result;
   }
 
-  Future<UserCredential> createUserWithEmailAndPassword(
-      String email, String password) async {
-    return await _firebaseAuth.createUserWithEmailAndPassword(
-      email: email, 
+  Future<void> createUserWithEmailAndPassword(String email, String password) async {
+    await _firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
       password: password,
     );
   }

@@ -11,20 +11,21 @@ class HomeScreen extends StatelessWidget {
     return Auth().currentUser;
   }
 
-  Future<void> signOut() async {
-    await Auth().signOut();
+  Future<void> signOut(BuildContext context) async {
+    try {
+      await Auth().signOut();
+      // Navigate to login page after successful sign out
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
+    } catch (e) {
+      print('Error signing out: $e');
+      // Optionally show an error message to the user
+    }
   }
 
   Widget _userUid() {
     final user = _getUser();
     return Text(user?.email ?? 'User email');
-  }
-
-  Widget _signOutButton() {
-    return ElevatedButton(
-      onPressed: signOut,
-      child: const Text('Sign Out'),
-    );
   }
 
   @override
@@ -37,9 +38,7 @@ class HomeScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, AppRoutes.login);
-            },
+            onPressed: () => signOut(context),
           ),
         ],
       ),
@@ -61,8 +60,6 @@ class HomeScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  _userUid(),
-                  _signOutButton(),
                   Text(
                     'Wandelwijs',
                     style: TextStyle(
