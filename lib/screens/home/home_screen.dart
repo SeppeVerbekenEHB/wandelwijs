@@ -84,6 +84,35 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
+            // Add profile button at the top center
+            Positioned(
+              top: 120, // Position below the app bar
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.green[700],
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      // TODO: Navigate to profile page
+                    },
+                    icon: const Icon(Icons.person, color: Colors.white, size: 28),
+                    padding: const EdgeInsets.all(12),
+                  ),
+                ),
+              ),
+            ),
             Positioned(
               bottom: 30,
               left: 0,
