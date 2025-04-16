@@ -84,9 +84,9 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // Add profile button at the top center
+            // profile button at the top center
             Positioned(
-              top: 120, // Position below the app bar
+              top: 80,
               left: 0,
               right: 0,
               child: Center(
@@ -125,7 +125,7 @@ class HomeScreen extends StatelessWidget {
                     // Missies button (left)
                     ElevatedButton(
                       onPressed: () {
-                        // TODO: Implement missies functionality
+                        // TODO: Navigate to missies page
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green[700],
@@ -147,7 +147,7 @@ class HomeScreen extends StatelessWidget {
                     // Album button (right)
                     ElevatedButton(
                       onPressed: () {
-                        // TODO: Implement album functionality
+                        // TODO: Navigate to album page
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green[700],
@@ -177,7 +177,7 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 200),
         child: ElevatedButton(
           onPressed: () {
-            // TODO: Implement scan functionality
+            // TODO: Navigate to scan page
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green[700],
