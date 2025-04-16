@@ -3,6 +3,10 @@ import 'routes/app_routes.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/register/register_screen.dart';
+import 'screens/profile/profile_screen.dart';
+import 'screens/missions/missions_screen.dart';
+import 'screens/album/album_screen.dart';
+import 'screens/scan/scan_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'screens/widget_tree.dart';
 
@@ -31,6 +35,10 @@ class MyApp extends StatelessWidget {
         AppRoutes.login: (context) => const LoginScreen(),
         AppRoutes.register: (context) => const RegisterScreen(),
         AppRoutes.home: (context) => const HomeScreen(),
+        AppRoutes.profile: (context) => const ProfileScreen(),
+        AppRoutes.missions: (context) => const MissionsScreen(),
+        AppRoutes.album: (context) => const AlbumScreen(),
+        AppRoutes.scan: (context) => const ScanScreen(),
       },
     );
   }

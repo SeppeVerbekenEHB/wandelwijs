@@ -2,7 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
 import '../../screens/auth.dart';
-
+import '../../screens/profile/profile_screen.dart';
+import '../../screens/missions/missions_screen.dart';
+import '../../screens/album/album_screen.dart';
+import '../../screens/scan/scan_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -105,7 +108,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: IconButton(
                     onPressed: () {
-                      // TODO: Navigate to profile page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                      );
                     },
                     icon: const Icon(Icons.person, color: Colors.white, size: 28),
                     padding: const EdgeInsets.all(12),
@@ -125,7 +131,10 @@ class HomeScreen extends StatelessWidget {
                     // Missies button (left)
                     ElevatedButton(
                       onPressed: () {
-                        // TODO: Navigate to missies page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const MissionsScreen()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green[700],
@@ -147,7 +156,10 @@ class HomeScreen extends StatelessWidget {
                     // Album button (right)
                     ElevatedButton(
                       onPressed: () {
-                        // TODO: Navigate to album page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const AlbumScreen()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green[700],
@@ -177,7 +189,10 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 200),
         child: ElevatedButton(
           onPressed: () {
-            // TODO: Navigate to scan page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ScanScreen()),
+            );
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green[700],
