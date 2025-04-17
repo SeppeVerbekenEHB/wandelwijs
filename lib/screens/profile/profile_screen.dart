@@ -51,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       backgroundColor: Colors.green,
                       child: Icon(Icons.person, size: 50, color: Colors.white),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Text(
                       user?.displayName ?? 'Wandelaar',
                       style: const TextStyle(
