@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// Remove the flutter_dotenv import
 import 'routes/app_routes.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/home/home_screen.dart';
@@ -12,6 +13,7 @@ import 'screens/widget_tree.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Remove the dotenv.load line
   await Firebase.initializeApp(); // Initialize Firebase
   runApp(const MyApp());
 }

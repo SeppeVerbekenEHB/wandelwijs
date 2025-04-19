@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'dart:async';
+import 'dart:io';
+import '../analyze/analyze_image_screen.dart';
 
 List<CameraDescription> cameras = [];
 
@@ -16,6 +18,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   CameraController? _cameraController;
   Future<void>? _initializeControllerFuture;
   bool _isCameraInitialized = false;
+  XFile? _capturedImage; // Variable to store the captured image
 
   @override
   void initState() {
@@ -119,6 +122,35 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _takePicture() async {
+    try {
+      // Ensure camera is initialized
+      if (_cameraController == null || !_cameraController!.value.isInitialized) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Camera is niet gereed')),
+        );
+        return;
+      }
+
+      // Take the picture
+      final XFile image = await _cameraController!.takePicture();
+      debugPrint('Image captured: ${image.path}');
+      
+      // Set the captured image
+      setState(() {
+        _capturedImage = image;
+      });
+      
+      return;
+    } catch (e) {
+      debugPrint('Error taking picture: $e');
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fout bij het nemen van een foto: $e')),
+      );
+    }
+  }
+
   void _toggleScan() {
     if (!_isCameraInitialized || _cameraController == null || !_cameraController!.value.isInitialized) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -132,64 +164,33 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
     });
     
     if (_isScanning) {
-      // Simulate scanning process for now
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) {
-          setState(() {
-            _isScanning = false;
-          });
-          _showScanResult();
-        }
+      // Take picture first, then continue with process
+      _takePicture().then((_) {
+        // Add a small delay to show scanning is happening
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            setState(() {
+              _isScanning = false;
+            });
+            
+            if (_capturedImage != null) {
+              // Navigate to analyze screen instead of showing dialog
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AnalyzeImageScreen(imageFile: _capturedImage!),
+                ),
+              );
+            } else {
+              // Show error if image capture failed
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Geen afbeelding vastgelegd. Probeer opnieuw.')),
+              );
+            }
+          }
+        });
       });
     }
-  }
-  
-  void _showScanResult() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Gevonden!',
-            style: TextStyle(fontFamily: 'Feijoada', fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'assets/images/Seamlessbackground.png',
-                height: 100,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Je hebt een Eik gevonden!',
-                style: TextStyle(fontFamily: 'Feijoada'),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Deze is toegevoegd aan je album.',
-                style: TextStyle(fontFamily: 'Feijoada', fontSize: 12),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: Text(
-                'OK',
-                style: TextStyle(
-                  color: Colors.green[700],
-                  fontFamily: 'Feijoada',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Widget _buildCameraPreview() {
