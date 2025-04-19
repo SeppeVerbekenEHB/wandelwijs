@@ -59,8 +59,11 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
             {
               'role': 'system',
               'content': 'You are a nature identification assistant that helps identify plants, trees, or animals in images. '
-                  'If you can identify the object, provide its common name in Dutch, followed by its scientific name, '
-                  'and a brief description of its characteristics. If you cannot identify it with certainty, just say "Niet herkend".'
+                  'Tell me what type of plant, tree or animal is in this image.'
+                    'If you detected more then 1 object in the image, give me the respons of what you are most certain about. Do not use scientific names, only simple names of species.'
+                    'your response should ook like this: species - tree/plant/animal'
+                    'the species name shoudl be in common dutch names, not in latin or english. '
+                    'If you cannot identify it with certainty, just say "Niet herkend".'
             },
             {
               'role': 'user',
