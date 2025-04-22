@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VerifyDiscoveryScreen extends StatefulWidget {
   final String speciesName;
@@ -30,19 +31,42 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
   }
 
   Future<void> _checkSpeciesInDatabase() async {
-    // TODO: Implement actual database check
-    // For now, just simulate a database check with a delay
-    await Future.delayed(const Duration(seconds: 2));
-    
+  try {
+    // Query Firestore for the species
+    final speciesDoc = await FirebaseFirestore.instance
+        .collection('species')
+        .where('name', isEqualTo: widget.speciesName)
+        .limit(1)
+        .get();
+
+    if (speciesDoc.docs.isNotEmpty) {
+      // Species found in database
+      final data = speciesDoc.docs.first.data();
+      setState(() {
+        _isLoading = false;
+        _pointsValue = data['points'] ?? 5;
+        _description = data['description'] ?? 
+          "Dit is een beschrijving van ${widget.speciesName}. "
+          "Meer details over deze soort worden binnenkort toegevoegd.";
+      });
+    } else {
+      // Species not found in database - use default values
+      setState(() {
+        _isLoading = false;
+        _pointsValue = 5; // Default points
+        _description = "Dit is een ${widget.speciesName}. "
+            "Deze soort staat nog niet in onze database met gedetailleerde informatie.";
+      });
+    }
+  } catch (e) {
+    print('Error querying database: $e');
     setState(() {
       _isLoading = false;
-      // Mock data - in the real implementation, these would come from the database
-      _pointsValue = 5; 
-      _description = "Dit is een beschrijving van ${widget.speciesName}. "
-          "In de toekomst zal deze informatie uit de database komen met "
-          "details over de soort, habitat en andere interessante feiten.";
+      _pointsValue = 5;
+      _description = "Er is een fout opgetreden bij het ophalen van informatie over ${widget.speciesName}.";
     });
   }
+}
 
   @override
   Widget build(BuildContext context) {
