@@ -18,7 +18,8 @@ class AnalyzeImageScreen extends StatefulWidget {
 class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTickerProviderStateMixin {
   bool _isLoading = true;
   String _result = "";
-  String _detectedObject = "";
+  String _speciesName = "";
+  String _speciesType = "";
   late AnimationController _animationController;
   
   @override
@@ -42,7 +43,6 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
     try {
       final apiKey = ApiConfig.openaiApiKey;
       
-      
       // Convert image file to base64
       final bytes = await widget.imageFile.readAsBytes();
       final base64Image = base64Encode(bytes);
@@ -61,7 +61,7 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
               'content': 'You are a nature identification assistant that helps identify plants, trees, or animals in images. '
                   'Tell me what type of plant, tree or animal is in this image.'
                     'If you detected more then 1 object in the image, give me the respons of what you are most certain about. Do not use scientific names, only simple names of species.'
-                    'your response should ook like this: species - tree/plant/animal'
+                    'your response should ook like this: species - Boom/Plant/Dier'
                     'the species name shoudl be in common dutch names, not in latin or english. '
                     'If you cannot identify it with certainty, just say "Niet herkend".'
             },
@@ -89,16 +89,20 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
         final jsonResponse = jsonDecode(response.body);
         final content = jsonResponse['choices'][0]['message']['content'];
         
-        // Parse the result to extract the name of the detected object
-        String detectedObject = 'Onbekend object';
+        // Parse the result to extract species name and type
+        String speciesName = 'Niet herkend';
+        String speciesType = '';
+        
         if (content != null && content.isNotEmpty) {
-          // Assuming the first line contains the name
+          // Extract from format "SpeciesName - Type"
           final lines = content.split('\n');
           if (lines.isNotEmpty) {
-            detectedObject = lines[0].replaceAll(RegExp(r'[^a-zA-Z0-9\s]'), '').trim();
-            // If it's longer than a typical name, take just the first few words
-            if (detectedObject.split(' ').length > 3) {
-              detectedObject = detectedObject.split(' ').take(2).join(' ');
+            final parts = lines[0].split('-');
+            if (parts.length >= 2) {
+              speciesName = parts[0].trim();
+              speciesType = parts[1].trim();
+            } else {
+              speciesName = lines[0].trim();
             }
           }
         }
@@ -106,7 +110,8 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
         setState(() {
           _isLoading = false;
           _result = content;
-          _detectedObject = detectedObject;
+          _speciesName = speciesName;
+          _speciesType = speciesType;
         });
       } else {
         setState(() {
@@ -121,6 +126,15 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
       });
       print("Error details: $e");
     }
+  }
+  
+  void _verifyAndContinue() {
+    // This will be implemented to navigate to the next screen
+    // with the verified species information
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Geverifieerd: $_speciesName - $_speciesType')),
+    );
+    // TODO: Navigate to next screen with the data
   }
   
   @override
@@ -202,60 +216,109 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
                                   ],
                                 ),
                               )
-                            : Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(20),
-                                  width: double.infinity,
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _detectedObject,
-                                          style: TextStyle(
-                                            fontSize: 22,
-                                            fontFamily: 'Feijoada',
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.green[700],
+                            : Container(
+                                padding: const EdgeInsets.all(20),
+                                width: double.infinity,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        _speciesName,
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          fontFamily: 'Feijoada',
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green[700],
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      if (_speciesType.isNotEmpty)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green[100],
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Text(
+                                            _speciesType,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontFamily: 'Feijoada',
+                                              color: Colors.green[800],
+                                            ),
                                           ),
                                         ),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          _result,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: 'Feijoada',
-                                          ),
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        'Is deze identificatie correct?',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Feijoada',
+                                          color: Colors.grey[800],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Expanded(
+                                            child: OutlinedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              style: OutlinedButton.styleFrom(
+                                                side: BorderSide(color: Colors.green[600]!, width: 2),
+                                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Nee, opnieuw',
+                                                style: TextStyle(
+                                                  fontFamily: 'Feijoada',
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.green[600],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 16),
+                                          Expanded(
+                                            child: ElevatedButton(
+                                              onPressed: _verifyAndContinue,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green[600],
+                                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                              ),
+                                              child: const Text(
+                                                'Ja, correct',
+                                                style: TextStyle(
+                                                  fontFamily: 'Feijoada',
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                       ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[700],
-                    padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    elevation: 8,
-                  ),
-                  child: const Text(
-                    'Terug',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontFamily: 'Feijoada',
                     ),
                   ),
                 ),
