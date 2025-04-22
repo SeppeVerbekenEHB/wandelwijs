@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
 import '../../config/api_config.dart';
+import '../verify/verify_discovery_screen.dart';
 
 class AnalyzeImageScreen extends StatefulWidget {
   final XFile imageFile;
@@ -59,11 +60,11 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
             {
               'role': 'system',
               'content': 'You are a nature identification assistant that helps identify plants, trees, or animals in images. '
-                  'Tell me what type of plant, tree or animal is in this image.'
-                    'If you detected more then 1 object in the image, give me the respons of what you are most certain about. Do not use scientific names, only simple names of species.'
-                    'your response should ook like this: species - Boom/Plant/Dier'
-                    'the species name shoudl be in common dutch names, not in latin or english. '
-                    'If you cannot identify it with certainty, just say "Niet herkend".'
+                  'Tell me what type of plant, tree or animal is in this image. '
+                  'If you detected more then 1 object in the image, give me the respons of what you are most certain about. Do not use scientific names, only simple names of species. '
+                  'your response should look like this: species - Boom/Plant/Dier '
+                  'the species name shoudl be in common dutch names, not in latin or english. '
+                  'If you cannot identify it with certainty, just say "Niet herkend".'
             },
             {
               'role': 'user',
@@ -129,12 +130,16 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
   }
   
   void _verifyAndContinue() {
-    // This will be implemented to navigate to the next screen
-    // with the verified species information
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Geverifieerd: $_speciesName - $_speciesType')),
+    // Navigate to the verify discovery screen with the species information
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VerifyDiscoveryScreen(
+          speciesName: _speciesName,
+          category: _speciesType,
+          imageFile: widget.imageFile,
+        ),
+      ),
     );
-    // TODO: Navigate to next screen with the data
   }
   
   @override
