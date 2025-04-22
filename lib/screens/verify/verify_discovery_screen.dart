@@ -79,6 +79,8 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
         backgroundColor: Colors.green[700],
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/Seamlessbackground.png'),
@@ -111,120 +113,187 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                 )
               : SingleChildScrollView(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start, // Add this to align all child widgets to the left
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 10,
-                              spreadRadius: 2,
-                            ),
-                          ],
+                      // Add congratulatory text at the top with larger font
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Proficiat!",
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green[800],
+                          ),
                         ),
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // Display the species image in a smaller size
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: Container(
-                                height: 150,
-                                width: double.infinity,
-                                child: Image.file(
-                                  File(widget.imageFile.path),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              widget.speciesName,
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontFamily: 'Feijoada',
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green[700],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
-                            if (widget.category.isNotEmpty)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.green[100],
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  widget.category,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'Feijoada',
-                                    color: Colors.green[800],
-                                  ),
-                                ),
-                              ),
-                            const SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                  size: 32,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  "$_pointsValue punten",
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    fontFamily: 'Feijoada',
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              _description,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Feijoada',
-                                color: Colors.grey[800],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                      ),
+                      const SizedBox(height: 10),
+                      // Dynamic message - keep centered
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          widget.category.toLowerCase().contains("dier") || 
+                          widget.category.toLowerCase().contains("vogel") || 
+                          widget.category.toLowerCase().contains("insect") ?
+                            "Je hebt een nieuw dier ontdekt!" :
+                            "Je hebt een nieuwe boom/plant ontdekt!",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontFamily: 'Feijoada',
+                            color: Color(0xFF4785D2), // Changed to the requested color #4785D2
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       const SizedBox(height: 30),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Return to home screen or discovery collection
-                          // TODO: Implement actual navigation or database recording
-                          Navigator.of(context).popUntil((route) => route.isFirst);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[600],
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                      
+                      // Row to contain image on left and points on right
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxHeight: 180,
+                                ),
+                                child: AspectRatio(
+                                  aspectRatio: 1.0, // Square aspect ratio
+                                  child: Image.file(
+                                    File(widget.imageFile.path),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
+                          
+                          const SizedBox(width: 16),
+                          
+                          // Points display
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Points row with better alignment
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(
+                                      width: 40, // Fixed width container for icon
+                                      child: Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                        size: 36, // Slightly adjusted
+                                      ),
+                                    ),
+                                    Text(
+                                      "$_pointsValue punten",
+                                      style: const TextStyle(
+                                        fontSize: 26,
+                                        fontFamily: 'Feijoada',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                
+                                const SizedBox(height: 12),
+                                
+                                // Discovery count row with matching alignment
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 40, // Same fixed width as above
+                                      child: Icon(
+                                        widget.category.toLowerCase().contains("dier") || 
+                                        widget.category.toLowerCase().contains("vogel") || 
+                                        widget.category.toLowerCase().contains("insect") ? 
+                                          Icons.pets : Icons.eco,
+                                        color: Color(0xFF4785D2),
+                                        size: 32, // Slightly adjusted
+                                      ),
+                                    ),
+                                    Text(
+                                      widget.category.toLowerCase().contains("dier") || 
+                                      widget.category.toLowerCase().contains("vogel") || 
+                                      widget.category.toLowerCase().contains("insect") ?
+                                        "+ 1 dier" :
+                                      widget.category.toLowerCase().contains("boom") ?
+                                        "+ 1 boom" : 
+                                        "+ 1 plant",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontFamily: 'Feijoada',
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF4785D2),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 10),
+                      
+                      Text(
+                        widget.speciesName,
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontFamily: 'Feijoada',
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF4785D2), // Changed to the requested color #4785D2
                         ),
-                        child: const Text(
-                          'Ontdekking Opslaan',
-                          style: TextStyle(
-                            fontFamily: 'Feijoada',
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                        // No need for textAlign when parent column is left-aligned
+                      ),
+                      
+                      const SizedBox(height: 10),
+                      
+                      // Left-align the description text (removed the Align wrapper)
+                      Text(
+                        _description,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Feijoada',
+                          color: Colors.grey[800],
+                        ),
+                        // Removed textAlign: TextAlign.center
+                      ),
+                      
+                      const SizedBox(height: 10),
+                      
+                      // Center the button
+                      Align(
+                        alignment: Alignment.center,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Return to home screen or discovery collection
+                            // TODO: Implement actual navigation or database recording
+                            Navigator.of(context).popUntil((route) => route.isFirst);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green[600],
+                            padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 18), // Increased padding
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: const Text(
+                            'Ontdekking Opslaan',
+                            style: TextStyle(
+                              fontFamily: 'Feijoada',
+                              fontSize: 22, // Increased from 18
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
