@@ -32,16 +32,22 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
 
   Future<void> _checkSpeciesInDatabase() async {
   try {
-    // Query Firestore for the species
-    final speciesDoc = await FirebaseFirestore.instance
+    // Convert the search term to lowercase for case-insensitive comparison
+    String searchName = widget.speciesName.toLowerCase();
+    
+    // Query Firestore for all species
+    final QuerySnapshot speciesSnapshot = await FirebaseFirestore.instance
         .collection('species')
-        .where('name', isEqualTo: widget.speciesName)
-        .limit(1)
         .get();
-
-    if (speciesDoc.docs.isNotEmpty) {
+    
+    // Find a matching species name ignoring case
+    final matchingDocs = speciesSnapshot.docs.where((doc) => 
+        doc['name'].toString().toLowerCase() == searchName
+    ).toList();
+    
+    if (matchingDocs.isNotEmpty) {
       // Species found in database
-      final data = speciesDoc.docs.first.data();
+      final data = matchingDocs.first.data() as Map<String, dynamic>;
       setState(() {
         _isLoading = false;
         _pointsValue = data['points'] ?? 5;
