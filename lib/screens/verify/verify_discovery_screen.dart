@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class VerifyDiscoveryScreen extends StatefulWidget {
   final String speciesName;
@@ -21,6 +22,7 @@ class VerifyDiscoveryScreen extends StatefulWidget {
 
 class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
   bool _isLoading = true;
+  bool _isSaving = false;
   int _pointsValue = 0;
   String _description = "";
 
@@ -74,6 +76,105 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
   }
 }
 
+  // Function to save discovery to Firestore without Firebase Storage
+  Future<void> _saveDiscovery() async {
+    if (_isSaving) return; // Prevent multiple saves
+    
+    setState(() {
+      _isSaving = true;
+    });
+    
+    try {
+      // Get current user
+      final user = FirebaseAuth.instance.currentUser;
+      
+      if (user == null) {
+        throw Exception("User not logged in");
+      }
+      
+      // Create discovery data - storing the local image path temporarily
+      // In a production app, TODO: upload the image to Firebase Storage and get the URL
+      final discoveryData = {
+        'speciesName': widget.speciesName,
+        'category': widget.category,
+        'description': _description,
+        'points': _pointsValue,
+        'localImagePath': widget.imageFile.path, // Store local path instead of URL
+        'timestamp': FieldValue.serverTimestamp(),
+        'userId': user.uid,
+      };
+      
+      // Add to Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('discoveries')
+          .add(discoveryData);
+      
+      // Update user points in a transaction
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        // Get user document
+        DocumentSnapshot userSnapshot = await transaction.get(
+          FirebaseFirestore.instance.collection('users').doc(user.uid)
+        );
+        
+        // Check if user document exists
+        if (!userSnapshot.exists) {
+          // Create user document if it doesn't exist
+          transaction.set(
+            FirebaseFirestore.instance.collection('users').doc(user.uid), 
+            {
+              'totalPoints': _pointsValue,
+              'discoveriesCount': 1
+            }
+          );
+        } else {
+          // User exists, update points and discoveries count
+          Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
+          int currentPoints = userData['totalPoints'] ?? 0;
+          int currentDiscoveries = userData['discoveriesCount'] ?? 0;
+          
+          transaction.update(
+            FirebaseFirestore.instance.collection('users').doc(user.uid), 
+            {
+              'totalPoints': currentPoints + _pointsValue,
+              'discoveriesCount': currentDiscoveries + 1
+            }
+          );
+        }
+      });
+      
+      // Show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Ontdekking succesvol opgeslagen!'),
+            backgroundColor: Colors.green[700],
+          )
+        );
+      }
+      
+      // Return to home screen
+      if (mounted) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    } catch (e) {
+      print('Error saving discovery: $e');
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fout bij opslaan van ontdekking: $e'),
+            backgroundColor: Colors.red,
+          )
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,7 +218,28 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                     ],
                   ),
                 )
-              : SingleChildScrollView(
+              : _isSaving 
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          color: Colors.green[700],
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Je ontdekking wordt opgeslagen...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Feijoada',
+                            color: Colors.green[700],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  )
+                : SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start, // Add this to align all child widgets to the left
                     children: [
@@ -280,11 +402,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                       Align(
                         alignment: Alignment.center,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Return to home screen or discovery collection
-                            // TODO: Implement actual navigation or database recording
-                            Navigator.of(context).popUntil((route) => route.isFirst);
-                          },
+                          onPressed: _saveDiscovery, // Changed from navigation to saving function
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green[600],
                             padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 18), // Increased padding
