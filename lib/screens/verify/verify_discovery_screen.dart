@@ -25,6 +25,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
   bool _isSaving = false;
   int _pointsValue = 0;
   String _description = "";
+  bool _isNewDiscovery = true; // New state variable to track if this is a new discovery
 
   @override
   void initState() {
@@ -33,48 +34,77 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
   }
 
   Future<void> _checkSpeciesInDatabase() async {
-  try {
-    // Convert the search term to lowercase for case-insensitive comparison
-    String searchName = widget.speciesName.toLowerCase();
-    
-    // Query Firestore for all species
-    final QuerySnapshot speciesSnapshot = await FirebaseFirestore.instance
-        .collection('species')
-        .get();
-    
-    // Find a matching species name ignoring case
-    final matchingDocs = speciesSnapshot.docs.where((doc) => 
-        doc['name'].toString().toLowerCase() == searchName
-    ).toList();
-    
-    if (matchingDocs.isNotEmpty) {
-      // Species found in database
-      final data = matchingDocs.first.data() as Map<String, dynamic>;
+    try {
+      // Convert the search term to lowercase for case-insensitive comparison
+      String searchName = widget.speciesName.toLowerCase();
+      
+      // Get current user
+      final user = FirebaseAuth.instance.currentUser;
+      
+      if (user == null) {
+        throw Exception("User not logged in");
+      }
+      
+      // Check if user has already discovered this species
+      final previousDiscoveries = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('discoveries')
+          .where('speciesName', isEqualTo: widget.speciesName)
+          .get();
+      
+      bool alreadyDiscovered = previousDiscoveries.docs.isNotEmpty;
+      
+      // Query Firestore for species data
+      final QuerySnapshot speciesSnapshot = await FirebaseFirestore.instance
+          .collection('species')
+          .get();
+      
+      // Find a matching species name ignoring case
+      final matchingDocs = speciesSnapshot.docs.where((doc) => 
+          doc['name'].toString().toLowerCase() == searchName
+      ).toList();
+      
+      if (matchingDocs.isNotEmpty) {
+        // Species found in database
+        final data = matchingDocs.first.data() as Map<String, dynamic>;
+        
+        // Calculate points - if already discovered, they get 1/4 of the points
+        int fullPoints = data['points'] ?? 5;
+        int adjustedPoints = alreadyDiscovered ? (fullPoints / 4).round() : fullPoints;
+        
+        setState(() {
+          _isLoading = false;
+          _pointsValue = adjustedPoints;
+          _description = data['description'] ?? 
+            "Dit is een beschrijving van ${widget.speciesName}. "
+            "Meer details over deze soort worden binnenkort toegevoegd.";
+          _isNewDiscovery = !alreadyDiscovered;
+        });
+      } else {
+        // Species not found in database - use default values
+        // Still check if user already discovered it
+        int adjustedPoints = alreadyDiscovered ? 1 : 5; // 1/4 of default 5 = ~1
+        
+        setState(() {
+          _isLoading = false;
+          _pointsValue = adjustedPoints;
+          _description = "Dit is een ${widget.speciesName}. "
+              "Deze soort staat nog niet in onze database met gedetailleerde informatie.";
+          _isNewDiscovery = !alreadyDiscovered;
+        });
+      }
+    } catch (e) {
+      print('Error querying database: $e');
       setState(() {
         _isLoading = false;
-        _pointsValue = data['points'] ?? 5;
-        _description = data['description'] ?? 
-          "Dit is een beschrijving van ${widget.speciesName}. "
-          "Meer details over deze soort worden binnenkort toegevoegd.";
-      });
-    } else {
-      // Species not found in database - use default values
-      setState(() {
-        _isLoading = false;
-        _pointsValue = 5; // Default points
-        _description = "Dit is een ${widget.speciesName}. "
-            "Deze soort staat nog niet in onze database met gedetailleerde informatie.";
+        _pointsValue = 5;
+        _description = "Er is een fout opgetreden bij het ophalen van informatie over ${widget.speciesName}.";
+        // Assuming it's new if we can't check
+        _isNewDiscovery = true;
       });
     }
-  } catch (e) {
-    print('Error querying database: $e');
-    setState(() {
-      _isLoading = false;
-      _pointsValue = 5;
-      _description = "Er is een fout opgetreden bij het ophalen van informatie over ${widget.speciesName}.";
-    });
   }
-}
 
   // Function to save discovery to Firestore without Firebase Storage
   Future<void> _saveDiscovery() async {
@@ -92,26 +122,28 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
         throw Exception("User not logged in");
       }
       
-      // Create discovery data - storing the local image path temporarily
-      // In a production app, TODO: upload the image to Firebase Storage and get the URL
-      final discoveryData = {
-        'speciesName': widget.speciesName,
-        'category': widget.category,
-        'description': _description,
-        'points': _pointsValue,
-        'localImagePath': widget.imageFile.path, // Store local path instead of URL
-        'timestamp': FieldValue.serverTimestamp(),
-        'userId': user.uid,
-      };
+      // Only add the discovery to Firestore if it's new
+      if (_isNewDiscovery) {
+        // Create discovery data - storing the local image path temporarily
+        final discoveryData = {
+          'speciesName': widget.speciesName,
+          'category': widget.category,
+          'description': _description,
+          'points': _pointsValue,
+          'localImagePath': widget.imageFile.path, // Store local path instead of URL
+          'timestamp': FieldValue.serverTimestamp(),
+          'userId': user.uid,
+        };
+        
+        // Add to Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('discoveries')
+            .add(discoveryData);
+      }
       
-      // Add to Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('discoveries')
-          .add(discoveryData);
-      
-      // Update user points in a transaction
+      // Update user points in a transaction - do this regardless of whether it's a new discovery
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         // Get user document
         DocumentSnapshot userSnapshot = await transaction.get(
@@ -125,11 +157,11 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
             FirebaseFirestore.instance.collection('users').doc(user.uid), 
             {
               'totalPoints': _pointsValue,
-              'discoveriesCount': 1
+              'discoveriesCount': _isNewDiscovery ? 1 : 0  // Only increment count if it's new
             }
           );
         } else {
-          // User exists, update points and discoveries count
+          // User exists, update points and only increment discoveries count if it's new
           Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
           int currentPoints = userData['totalPoints'] ?? 0;
           int currentDiscoveries = userData['discoveriesCount'] ?? 0;
@@ -138,17 +170,20 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
             FirebaseFirestore.instance.collection('users').doc(user.uid), 
             {
               'totalPoints': currentPoints + _pointsValue,
-              'discoveriesCount': currentDiscoveries + 1
+              'discoveriesCount': _isNewDiscovery ? currentDiscoveries + 1 : currentDiscoveries
             }
           );
         }
       });
       
-      // Show success message
+      // Show success message with different text based on whether it's a new discovery
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Ontdekking succesvol opgeslagen!'),
+            content: Text(_isNewDiscovery 
+              ? 'Nieuwe ontdekking succesvol opgeslagen!'
+              : 'Je hebt ${_pointsValue} punten ontvangen!'
+            ),
             backgroundColor: Colors.green[700],
           )
         );
@@ -260,11 +295,13 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                       Align(
                         alignment: Alignment.center,
                         child: Text(
-                          widget.category.toLowerCase().contains("dier") || 
-                          widget.category.toLowerCase().contains("vogel") || 
-                          widget.category.toLowerCase().contains("insect") ?
-                            "Je hebt een nieuw dier ontdekt!" :
-                            "Je hebt een nieuwe boom/plant ontdekt!",
+                          _isNewDiscovery
+                              ? (widget.category.toLowerCase().contains("dier") || 
+                                 widget.category.toLowerCase().contains("vogel") || 
+                                 widget.category.toLowerCase().contains("insect")
+                                     ? "Je hebt een nieuw dier ontdekt!"
+                                     : "Je hebt een nieuwe boom/plant ontdekt!")
+                              : "Je hebt deze soort opnieuw gevonden!",
                           style: TextStyle(
                             fontSize: 22,
                             fontFamily: 'Feijoada',
@@ -273,6 +310,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                           textAlign: TextAlign.center,
                         ),
                       ),
+                      
                       const SizedBox(height: 30),
                       
                       // Row to contain image on left and points on right
@@ -333,37 +371,38 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                                 const SizedBox(height: 12),
                                 
                                 // Discovery count row with matching alignment
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 40, // Same fixed width as above
-                                      child: Icon(
+                                if (_isNewDiscovery)
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 40, // Same fixed width as above
+                                        child: Icon(
+                                          widget.category.toLowerCase().contains("dier") || 
+                                          widget.category.toLowerCase().contains("vogel") || 
+                                          widget.category.toLowerCase().contains("insect") ? 
+                                            Icons.pets : Icons.eco,
+                                          color: Color(0xFF4785D2),
+                                          size: 32, // Slightly adjusted
+                                        ),
+                                      ),
+                                      Text(
                                         widget.category.toLowerCase().contains("dier") || 
                                         widget.category.toLowerCase().contains("vogel") || 
-                                        widget.category.toLowerCase().contains("insect") ? 
-                                          Icons.pets : Icons.eco,
-                                        color: Color(0xFF4785D2),
-                                        size: 32, // Slightly adjusted
+                                        widget.category.toLowerCase().contains("insect") ?
+                                          "+ 1 dier" :
+                                        widget.category.toLowerCase().contains("boom") ?
+                                          "+ 1 boom" : 
+                                          "+ 1 plant",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontFamily: 'Feijoada',
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF4785D2),
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      widget.category.toLowerCase().contains("dier") || 
-                                      widget.category.toLowerCase().contains("vogel") || 
-                                      widget.category.toLowerCase().contains("insect") ?
-                                        "+ 1 dier" :
-                                      widget.category.toLowerCase().contains("boom") ?
-                                        "+ 1 boom" : 
-                                        "+ 1 plant",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontFamily: 'Feijoada',
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF4785D2),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
                               ],
                             ),
                           ),
