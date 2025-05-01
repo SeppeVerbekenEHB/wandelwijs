@@ -60,10 +60,14 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
           .collection('species')
           .get();
       
-      // Find a matching species name ignoring case
-      final matchingDocs = speciesSnapshot.docs.where((doc) => 
-          doc['name'].toString().toLowerCase() == searchName
-      ).toList();
+      // Find matching species using partial match (contains) and case insensitive
+      final matchingDocs = speciesSnapshot.docs.where((doc) {
+        // Get the database species name and convert to lowercase
+        String dbSpeciesName = doc['name'].toString().toLowerCase();
+        
+        // Check if either string contains the other
+        return dbSpeciesName.contains(searchName) || searchName.contains(dbSpeciesName);
+      }).toList();
       
       if (matchingDocs.isNotEmpty) {
         // Species found in database
