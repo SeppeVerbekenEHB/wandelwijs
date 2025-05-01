@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AlbumScreen extends StatefulWidget {
   const AlbumScreen({super.key});
@@ -8,40 +10,106 @@ class AlbumScreen extends StatefulWidget {
 }
 
 class _AlbumScreenState extends State<AlbumScreen> {
-  final List<Map<String, dynamic>> _categories = [
+  List<Map<String, dynamic>> _categories = [
     {
       'name': 'Bomen',
       'icon': Icons.park,
-      'items': [
-        {'name': 'Eik', 'discovered': false, 'image': null},
-        {'name': 'Beuk', 'discovered': false, 'image': null},
-        {'name': 'Den', 'discovered': false, 'image': null},
-        {'name': 'Berk', 'discovered': false, 'image': null},
-        {'name': 'Esdoorn', 'discovered': false, 'image': null},
-      ]
+      'items': [],
     },
     {
       'name': 'Dieren',
       'icon': Icons.pets,
-      'items': [
-        {'name': 'Konijn', 'discovered': false, 'image': null},
-        {'name': 'Eekhoorn', 'discovered': false, 'image': null},
-        {'name': 'Hert', 'discovered': false, 'image': null},
-        {'name': 'Vos', 'discovered': false, 'image': null},
-      ]
+      'items': [],
     },
     {
       'name': 'Planten',
       'icon': Icons.local_florist,
-      'items': [
-        {'name': 'Zonnebloem', 'discovered': false, 'image': null},
-        {'name': 'Brandnetel', 'discovered': false, 'image': null},
-        {'name': 'Madeliefje', 'discovered': false, 'image': null},
-      ]
+      'items': [],
     },
   ];
 
   int _currentCategory = 0;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSpeciesData();
+  }
+
+  Future<void> _loadSpeciesData() async {
+    try {
+      // Get current user
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        setState(() {
+          _error = "User not logged in";
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Get all species from Firestore
+      final QuerySnapshot speciesSnapshot = await FirebaseFirestore.instance
+          .collection('species')
+          .get();
+
+      // Get user discoveries to track which species are discovered
+      final userDiscoveries = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('discoveries')
+          .get();
+
+      // Create a set of discovered species names for quick lookup
+      final Set<String> discoveredSpeciesNames = {};
+      for (var doc in userDiscoveries.docs) {
+        discoveredSpeciesNames.add(doc['speciesName']);
+      }
+
+      // Clear existing items
+      for (var category in _categories) {
+        category['items'] = [];
+      }
+
+      // Categorize each species based on its category field
+      for (var doc in speciesSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final String name = data['name'] ?? 'Unknown';
+        final String category = data['category'] ?? 'Unknown';
+        final String? imageUrl = data['imageUrl'];
+        final bool discovered = discoveredSpeciesNames.contains(name);
+
+        final Map<String, dynamic> item = {
+          'name': name,
+          'discovered': discovered,
+          'image': imageUrl,
+          'description': data['description'] ?? '',
+          'points': data['points'] ?? 5,
+        };
+
+        // Add to appropriate category
+        if (category == 'Boom') {
+          _categories[0]['items'].add(item);
+        } else if (category == 'Dier') {
+          _categories[1]['items'].add(item);
+        } else if (category == 'Plant') {
+          _categories[2]['items'].add(item);
+        }
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,123 +128,192 @@ class _AlbumScreenState extends State<AlbumScreen> {
             fit: BoxFit.cover,
           ),
         ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: SizedBox(
-                height: 50,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _categories.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ChoiceChip(
-                        label: Row(
-                          children: [
-                            Icon(
-                              _categories[index]['icon'],
-                              color: _currentCategory == index
-                                  ? Colors.white
-                                  : Colors.green[700],
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              _categories[index]['name'],
-                              style: TextStyle(
-                                fontFamily: 'Feijoada',
-                                color: _currentCategory == index
-                                    ? Colors.white
-                                    : Colors.green[700],
-                                fontWeight: FontWeight.bold,
+        child: _isLoading 
+          ? Center(
+              child: CircularProgressIndicator(
+                color: Colors.green[700],
+              ),
+            )
+          : _error != null 
+            ? Center(
+                child: Text(
+                  'Error: $_error',
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontFamily: 'Feijoada',
+                    fontSize: 16,
+                  ),
+                ),
+              )
+            : Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: SizedBox(
+                      height: 50,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _categories.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: ChoiceChip(
+                              label: Row(
+                                children: [
+                                  Icon(
+                                    _categories[index]['icon'],
+                                    color: _currentCategory == index
+                                        ? Colors.white
+                                        : Colors.green[700],
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    "${_categories[index]['name']} (${(_categories[index]['items'] as List).length})",
+                                    style: TextStyle(
+                                      fontFamily: 'Feijoada',
+                                      color: _currentCategory == index
+                                          ? Colors.white
+                                          : Colors.green[700],
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
+                              selected: _currentCategory == index,
+                              selectedColor: Colors.green[700],
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  _currentCategory = selected ? index : _currentCategory;
+                                });
+                              },
                             ),
-                          ],
-                        ),
-                        selected: _currentCategory == index,
-                        selectedColor: Colors.green[700],
-                        onSelected: (bool selected) {
-                          setState(() {
-                            _currentCategory = selected ? index : _currentCategory;
-                          });
+                          );
                         },
                       ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(16.0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                itemCount: _categories[_currentCategory]['items'].length,
-                itemBuilder: (context, index) {
-                  final item = _categories[_currentCategory]['items'][index];
-                  return Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        item['discovered']
-                            ? (item['image'] != null
-                                ? Image.asset(
-                                    item['image'],
-                                    fit: BoxFit.cover,
-                                  )
-                                : Container(
-                                    color: Colors.green[100],
-                                    child: Icon(
-                                      _categories[_currentCategory]['icon'],
-                                      size: 50,
-                                      color: Colors.green[700],
-                                    ),
-                                  ))
-                            : Container(
-                                color: Colors.grey[300],
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.lock,
-                                    size: 40,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            color: Colors.black54,
+                  ),
+                  Expanded(
+                    child: (_categories[_currentCategory]['items'] as List).isEmpty
+                        ? Center(
                             child: Text(
-                              item['name'],
-                              style: const TextStyle(
+                              'Geen ${_categories[_currentCategory]['name'].toString().toLowerCase()} gevonden',
+                              style: TextStyle(
                                 fontFamily: 'Feijoada',
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.green[700],
                               ),
-                              textAlign: TextAlign.center,
                             ),
+                          )
+                        : GridView.builder(
+                            padding: const EdgeInsets.all(16.0),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                            ),
+                            itemCount: (_categories[_currentCategory]['items'] as List).length,
+                            itemBuilder: (context, index) {
+                              final item = _categories[_currentCategory]['items'][index];
+                              return Card(
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    item['discovered']
+                                        ? (item['image'] != null
+                                            ? Image.network(
+                                                item['image'],
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error, stackTrace) {
+                                                  return Container(
+                                                    color: Colors.green[100],
+                                                    child: Icon(
+                                                      _categories[_currentCategory]['icon'],
+                                                      size: 50,
+                                                      color: Colors.green[700],
+                                                    ),
+                                                  );
+                                                },
+                                                loadingBuilder: (context, child, loadingProgress) {
+                                                  if (loadingProgress == null) return child;
+                                                  return Center(
+                                                    child: CircularProgressIndicator(
+                                                      color: Colors.green[700],
+                                                      value: loadingProgress.expectedTotalBytes != null
+                                                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                          : null,
+                                                    ),
+                                                  );
+                                                },
+                                              )
+                                            : Container(
+                                                color: Colors.green[100],
+                                                child: Icon(
+                                                  _categories[_currentCategory]['icon'],
+                                                  size: 50,
+                                                  color: Colors.green[700],
+                                                ),
+                                              ))
+                                        : Container(
+                                            color: Colors.grey[300],
+                                            child: const Center(
+                                              child: Icon(
+                                                Icons.lock,
+                                                size: 40,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                    Positioned(
+                                      bottom: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        color: Colors.black54,
+                                        child: Text(
+                                          item['name'],
+                                          style: const TextStyle(
+                                            fontFamily: 'Feijoada',
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                    if (item['discovered'])
+                                      Positioned(
+                                        top: 8,
+                                        right: 8,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green[700],
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Text(
+                                            "${item['points']}pt",
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
