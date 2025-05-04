@@ -497,13 +497,41 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                                       ))
                                           )
                                         : Container(
-                                            color: Colors.grey[300],
-                                            child: const Center(
-                                              child: Icon(
-                                                Icons.lock,
-                                                size: 40,
-                                                color: Colors.grey,
+                                            // Replace the simple lock with a silhouette design
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                                colors: [Colors.grey[200]!, Colors.grey[400]!],
                                               ),
+                                            ),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                // Show a larger, faded category icon as silhouette
+                                                Icon(
+                                                  _categories[_currentCategory]['icon'],
+                                                  size: 80,
+                                                  color: Colors.grey[600]!.withOpacity(0.4),
+                                                ),
+                                                // Small lock icon in the corner
+                                                Positioned(
+                                                  top: 8,
+                                                  right: 8,
+                                                  child: Container(
+                                                    padding: const EdgeInsets.all(4),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[600]!.withOpacity(0.7),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.lock,
+                                                      color: Colors.white,
+                                                      size: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                     Positioned(
@@ -514,7 +542,8 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                         padding: const EdgeInsets.all(8.0),
                                         color: Colors.black54,
                                         child: Text(
-                                          item['name'],
+                                          // For undiscovered species, show "Onbekend" instead of the name
+                                          item['discovered'] ? item['name'] : "Onbekend ${_getCategoryInDutch(_currentCategory)}",
                                           style: const TextStyle(
                                             fontFamily: 'Feijoada',
                                             color: Colors.white,
@@ -554,5 +583,15 @@ class _AlbumScreenState extends State<AlbumScreen> {
               ),
       ),
     );
+  }
+  
+  // Helper method to get singular Dutch name for category
+  String _getCategoryInDutch(int categoryIndex) {
+    switch(categoryIndex) {
+      case 0: return "Boom";
+      case 1: return "Dier";
+      case 2: return "Plant";
+      default: return "";
+    }
   }
 }
