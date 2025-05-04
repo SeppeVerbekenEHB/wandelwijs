@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
 
 class AlbumScreen extends StatefulWidget {
   const AlbumScreen({super.key});
@@ -63,10 +64,22 @@ class _AlbumScreenState extends State<AlbumScreen> {
           .collection('discoveries')
           .get();
 
-      // Create a set of discovered species names for quick lookup
+      // Create a map of discovered species with their image paths
+      final Map<String, String> discoveredSpeciesImages = {};
       final Set<String> discoveredSpeciesNames = {};
+      
       for (var doc in userDiscoveries.docs) {
-        discoveredSpeciesNames.add(doc['speciesName']);
+        final data = doc.data();
+        final speciesName = data['speciesName'] as String;
+        final imagePath = data['localImagePath'] as String?;
+        
+        discoveredSpeciesNames.add(speciesName);
+        
+        // Only store the image path if it exists and we don't already have one for this species
+        // (this keeps the first image a user captured of each species)
+        if (imagePath != null && !discoveredSpeciesImages.containsKey(speciesName)) {
+          discoveredSpeciesImages[speciesName] = imagePath;
+        }
       }
 
       // Clear existing items
@@ -81,11 +94,13 @@ class _AlbumScreenState extends State<AlbumScreen> {
         final String category = data['category'] ?? 'Unknown';
         final String? imageUrl = data['imageUrl'];
         final bool discovered = discoveredSpeciesNames.contains(name);
+        final String? discoveredImagePath = discoveredSpeciesImages[name];
 
         final Map<String, dynamic> item = {
           'name': name,
           'discovered': discovered,
           'image': imageUrl,
+          'discoveredImagePath': discoveredImagePath, // Add the discovered image path
           'description': data['description'] ?? '',
           'points': data['points'] ?? 5,
         };
@@ -142,36 +157,73 @@ class _AlbumScreenState extends State<AlbumScreen> {
                   
                   const SizedBox(height: 16),
                   
-                  // Image section
+                  // Image section - prioritize user's discovered image
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15),
-                    child: item['image'] != null 
-                      ? Image.network(
-                          item['image'],
+                    child: item['discoveredImagePath'] != null
+                      ? Image.file(
+                          File(item['discoveredImagePath']),
                           height: 200,
                           width: double.infinity,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 200,
-                              color: Colors.green[100],
-                              child: Icon(
-                                categoryIcon,
-                                size: 80,
-                                color: Colors.green[700],
-                              ),
-                            );
+                            // Fallback to database image if file not found
+                            return item['image'] != null 
+                              ? Image.network(
+                                  item['image'],
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      height: 200,
+                                      color: Colors.green[100],
+                                      child: Icon(
+                                        categoryIcon,
+                                        size: 80,
+                                        color: Colors.green[700],
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Container(
+                                  height: 200,
+                                  color: Colors.green[100],
+                                  child: Icon(
+                                    categoryIcon,
+                                    size: 80,
+                                    color: Colors.green[700],
+                                  ),
+                                );
                           },
                         )
-                      : Container(
-                          height: 200,
-                          color: Colors.green[100],
-                          child: Icon(
-                            categoryIcon,
-                            size: 80,
-                            color: Colors.green[700],
+                      : item['image'] != null 
+                        ? Image.network(
+                            item['image'],
+                            height: 200,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 200,
+                                color: Colors.green[100],
+                                child: Icon(
+                                  categoryIcon,
+                                  size: 80,
+                                  color: Colors.green[700],
+                                ),
+                              );
+                            },
+                          )
+                        : Container(
+                            height: 200,
+                            color: Colors.green[100],
+                            child: Icon(
+                              categoryIcon,
+                              size: 80,
+                              color: Colors.green[700],
+                            ),
                           ),
-                        ),
                   ),
                   
                   const SizedBox(height: 16),
@@ -365,40 +417,84 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                               item, 
                                               _categories[_currentCategory]['icon'],
                                             ),
-                                            child: (item['image'] != null
-                                                ? Image.network(
-                                                    item['image'],
+                                            child: (item['discoveredImagePath'] != null
+                                                ? Image.file(
+                                                    File(item['discoveredImagePath']),
                                                     fit: BoxFit.cover,
                                                     errorBuilder: (context, error, stackTrace) {
-                                                      return Container(
+                                                      // Fallback to database image or icon
+                                                      return item['image'] != null 
+                                                        ? Image.network(
+                                                            item['image'],
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (context, error, stackTrace) {
+                                                              return Container(
+                                                                color: Colors.green[100],
+                                                                child: Icon(
+                                                                  _categories[_currentCategory]['icon'],
+                                                                  size: 50,
+                                                                  color: Colors.green[700],
+                                                                ),
+                                                              );
+                                                            },
+                                                            // Keep existing loading builder
+                                                            loadingBuilder: (context, child, loadingProgress) {
+                                                              if (loadingProgress == null) return child;
+                                                              return Center(
+                                                                child: CircularProgressIndicator(
+                                                                  color: Colors.green[700],
+                                                                  value: loadingProgress.expectedTotalBytes != null
+                                                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                                      : null,
+                                                                ),
+                                                              );
+                                                            },
+                                                          )
+                                                        : Container(
+                                                            color: Colors.green[100],
+                                                            child: Icon(
+                                                              _categories[_currentCategory]['icon'],
+                                                              size: 50,
+                                                              color: Colors.green[700],
+                                                            ),
+                                                          );
+                                                    },
+                                                  )
+                                                : item['image'] != null
+                                                    ? Image.network(
+                                                        item['image'],
+                                                        fit: BoxFit.cover,
+                                                        // Keep existing error and loading builders
+                                                        errorBuilder: (context, error, stackTrace) {
+                                                          return Container(
+                                                            color: Colors.green[100],
+                                                            child: Icon(
+                                                              _categories[_currentCategory]['icon'],
+                                                              size: 50,
+                                                              color: Colors.green[700],
+                                                            ),
+                                                          );
+                                                        },
+                                                        loadingBuilder: (context, child, loadingProgress) {
+                                                          if (loadingProgress == null) return child;
+                                                          return Center(
+                                                            child: CircularProgressIndicator(
+                                                              color: Colors.green[700],
+                                                              value: loadingProgress.expectedTotalBytes != null
+                                                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                                  : null,
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : Container(
                                                         color: Colors.green[100],
                                                         child: Icon(
                                                           _categories[_currentCategory]['icon'],
                                                           size: 50,
                                                           color: Colors.green[700],
                                                         ),
-                                                      );
-                                                    },
-                                                    loadingBuilder: (context, child, loadingProgress) {
-                                                      if (loadingProgress == null) return child;
-                                                      return Center(
-                                                        child: CircularProgressIndicator(
-                                                          color: Colors.green[700],
-                                                          value: loadingProgress.expectedTotalBytes != null
-                                                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                                              : null,
-                                                        ),
-                                                      );
-                                                    },
-                                                  )
-                                                : Container(
-                                                    color: Colors.green[100],
-                                                    child: Icon(
-                                                      _categories[_currentCategory]['icon'],
-                                                      size: 50,
-                                                      color: Colors.green[700],
-                                                    ),
-                                                  ))
+                                                      ))
                                           )
                                         : Container(
                                             color: Colors.grey[300],
