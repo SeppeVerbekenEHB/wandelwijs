@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/mission_service.dart';
 
 class VerifyDiscoveryScreen extends StatefulWidget {
   final String speciesName;
@@ -26,6 +27,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
   int _pointsValue = 0;
   String _description = "";
   bool _isNewDiscovery = true; // New state variable to track if this is a new discovery
+  final MissionService _missionService = MissionService();
 
   @override
   void initState() {
@@ -179,6 +181,11 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
           );
         }
       });
+      
+      // Update missions if this is a new discovery
+      if (_isNewDiscovery) {
+        await _missionService.updateMissionsForDiscovery(widget.category, widget.speciesName);
+      }
       
       // Show success message with different text based on whether it's a new discovery
       if (mounted) {
