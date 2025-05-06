@@ -41,7 +41,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
       appBar: AppBar(
         title: const Text(
           'Missies',
-          style: TextStyle(fontFamily: 'Feijoada', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Sniglet'),
         ),
         backgroundColor: Colors.green[700],
       ),
@@ -82,7 +82,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                             child: Text(
                               'Er is iets misgegaan: ${snapshot.error}',
                               style: TextStyle(
-                                fontFamily: 'Feijoada',
+                                fontFamily: 'Sniglet',
                                 color: Colors.red[700],
                               ),
                             ),
@@ -104,7 +104,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                             child: Text(
                               'Geen missies gevonden',
                               style: TextStyle(
-                                fontFamily: 'Feijoada',
+                                fontFamily: 'Sniglet',
                                 fontSize: 18,
                               ),
                             ),
@@ -142,8 +142,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                                             mission.title,
                                             style: TextStyle(
                                               fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'Feijoada',
+                                              fontFamily: 'Sniglet',
                                               color: mission.completed 
                                                   ? Colors.grey[700]
                                                   : Colors.black,
@@ -172,8 +171,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                                                 Text(
                                                   '+${mission.reward}',
                                                   style: const TextStyle(
-                                                    fontFamily: 'Feijoada',
-                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'Sniglet',
                                                   ),
                                                 ),
                                               ],
@@ -185,7 +183,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                                     Text(
                                       mission.description,
                                       style: TextStyle(
-                                        fontFamily: 'Feijoada',
+                                        fontFamily: 'Sniglet',
                                         color: Colors.grey[700],
                                       ),
                                     ),
@@ -200,7 +198,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                                     const SizedBox(height: 8),
                                     Text(
                                       '${mission.progress}/${mission.total}',
-                                      style: const TextStyle(fontFamily: 'Feijoada'),
+                                      style: const TextStyle(fontFamily: 'Sniglet'),
                                     ),
                                   ],
                                 ),

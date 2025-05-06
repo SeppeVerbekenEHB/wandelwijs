@@ -43,6 +43,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   http: ^1.3.0
   path: ^1.9.1
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +73,8 @@ flutter:
     - family: RetroChild
       fonts:
         - asset: assets/fonts/RetroChild.ttf
-    - family: Feijoada
+    - family: Sniglet
       fonts:
-        - asset: assets/fonts/Feijoada.ttf
+        - asset: assets/fonts/Sniglet-Regular.ttf
+        - asset: assets/fonts/Sniglet-ExtraBold.ttf
+          weight: 800

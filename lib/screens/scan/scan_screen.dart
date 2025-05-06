@@ -243,7 +243,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       appBar: AppBar(
         title: const Text(
           'Scannen',
-          style: TextStyle(fontFamily: 'Feijoada', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Sniglet'),
         ),
         backgroundColor: Colors.green[700],
       ),
@@ -286,8 +286,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
                         'Richt je camera op een voorwerp in de natuur',
                         style: TextStyle(
                           fontSize: 18,
-                          fontFamily: 'Feijoada',
-                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Sniglet',
                         ),
                         textAlign: TextAlign.center,
                       ),

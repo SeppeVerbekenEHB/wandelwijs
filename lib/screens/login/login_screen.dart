@@ -173,9 +173,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         const Text(
                           'Wandelen wordt een avontuur',
                           style: TextStyle(
-                            fontFamily: 'Feijoada',
+                            fontFamily: 'Sniglet',
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
                         ),

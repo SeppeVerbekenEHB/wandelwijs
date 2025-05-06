@@ -148,8 +148,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                     item['name'],
                     style: TextStyle(
                       fontSize: 24,
-                      fontFamily: 'Feijoada',
-                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Sniglet',
                       color: Color(0xFF4785D2),
                     ),
                     textAlign: TextAlign.center,
@@ -242,8 +241,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                         "${item['points']} punten",
                         style: TextStyle(
                           fontSize: 18,
-                          fontFamily: 'Feijoada',
-                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Sniglet',
                           color: Colors.green[800],
                         ),
                       ),
@@ -259,7 +257,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                       : 'Geen beschrijving beschikbaar voor deze soort.',
                     style: TextStyle(
                       fontSize: 16,
-                      fontFamily: 'Feijoada',
+                      fontFamily: 'Sniglet',
                       color: Colors.grey[800],
                     ),
                     textAlign: TextAlign.center,
@@ -282,10 +280,9 @@ class _AlbumScreenState extends State<AlbumScreen> {
                     child: const Text(
                       'Sluiten',
                       style: TextStyle(
-                        fontFamily: 'Feijoada',
+                        fontFamily: 'Sniglet',
                         fontSize: 16,
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -304,7 +301,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
       appBar: AppBar(
         title: const Text(
           'Verzamelalbum',
-          style: TextStyle(fontFamily: 'Feijoada', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Sniglet'),
         ),
         backgroundColor: Colors.green[700],
       ),
@@ -327,7 +324,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                   'Error: $_error',
                   style: const TextStyle(
                     color: Colors.red,
-                    fontFamily: 'Feijoada',
+                    fontFamily: 'Sniglet',
                     fontSize: 16,
                   ),
                 ),
@@ -358,11 +355,10 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                   Text(
                                     "${_categories[index]['name']} (${(_categories[index]['items'] as List).length})",
                                     style: TextStyle(
-                                      fontFamily: 'Feijoada',
+                                      fontFamily: 'Sniglet',
                                       color: _currentCategory == index
                                           ? Colors.white
                                           : Colors.green[700],
-                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ],
@@ -386,7 +382,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                             child: Text(
                               'Geen ${_categories[_currentCategory]['name'].toString().toLowerCase()} gevonden',
                               style: TextStyle(
-                                fontFamily: 'Feijoada',
+                                fontFamily: 'Sniglet',
                                 fontSize: 18,
                                 color: Colors.green[700],
                               ),
@@ -542,12 +538,15 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                         padding: const EdgeInsets.all(8.0),
                                         color: Colors.black54,
                                         child: Text(
-                                          // For undiscovered species, show "Onbekend" instead of the name
-                                          item['discovered'] ? item['name'] : "Onbekend ${_getCategoryInDutch(_currentCategory)}",
+                                          // For undiscovered species, use correct Dutch grammar
+                                          item['discovered'] 
+                                            ? item['name'] 
+                                            : _currentCategory == 1 
+                                                ? "Onbekend ${_getCategoryInDutch(_currentCategory)}" 
+                                                : "Onbekende ${_getCategoryInDutch(_currentCategory)}",
                                           style: const TextStyle(
-                                            fontFamily: 'Feijoada',
+                                            fontFamily: 'Sniglet',
                                             color: Colors.white,
-                                            fontWeight: FontWeight.bold,
                                           ),
                                           textAlign: TextAlign.center,
                                         ),
@@ -568,7 +567,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                             style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 10,
-                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         ),

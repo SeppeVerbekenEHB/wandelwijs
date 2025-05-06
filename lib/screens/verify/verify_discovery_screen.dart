@@ -227,7 +227,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
       appBar: AppBar(
         title: const Text(
           'Ontdekking Verifiëren',
-          style: TextStyle(fontFamily: 'Feijoada', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Sniglet'),
         ),
         backgroundColor: Colors.green[700],
       ),
@@ -256,7 +256,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                         'Even geduld, we verifiëren je ontdekking...',
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: 'Feijoada',
+                          fontFamily: 'Sniglet',
                           color: Colors.green[700],
                         ),
                         textAlign: TextAlign.center,
@@ -277,7 +277,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                           'Je ontdekking wordt opgeslagen...',
                           style: TextStyle(
                             fontSize: 16,
-                            fontFamily: 'Feijoada',
+                            fontFamily: 'Sniglet',
                             color: Colors.green[700],
                           ),
                           textAlign: TextAlign.center,
@@ -315,7 +315,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                               : "Je hebt deze soort opnieuw gevonden!",
                           style: TextStyle(
                             fontSize: 22,
-                            fontFamily: 'Feijoada',
+                            fontFamily: 'Sniglet',
                             color: Color(0xFF4785D2), // Changed to the requested color #4785D2
                           ),
                           textAlign: TextAlign.center,
@@ -372,8 +372,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                                       "$_pointsValue punten",
                                       style: const TextStyle(
                                         fontSize: 26,
-                                        fontFamily: 'Feijoada',
-                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Sniglet',
                                       ),
                                     ),
                                   ],
@@ -407,8 +406,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                                           "+ 1 plant",
                                         style: TextStyle(
                                           fontSize: 20,
-                                          fontFamily: 'Feijoada',
-                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Sniglet',
                                           color: Color(0xFF4785D2),
                                         ),
                                       ),
@@ -426,8 +424,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                         widget.speciesName,
                         style: TextStyle(
                           fontSize: 32,
-                          fontFamily: 'Feijoada',
-                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Sniglet',
                           color: Color(0xFF4785D2), // Changed to the requested color #4785D2
                         ),
                         // No need for textAlign when parent column is left-aligned
@@ -440,7 +437,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                         _description,
                         style: TextStyle(
                           fontSize: 18,
-                          fontFamily: 'Feijoada',
+                          fontFamily: 'Sniglet',
                           color: Colors.grey[800],
                         ),
                         // Removed textAlign: TextAlign.center
@@ -463,9 +460,8 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                           child: const Text(
                             'Ontdekking Opslaan',
                             style: TextStyle(
-                              fontFamily: 'Feijoada',
+                              fontFamily: 'Sniglet',
                               fontSize: 22, // Increased from 18
-                              fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),

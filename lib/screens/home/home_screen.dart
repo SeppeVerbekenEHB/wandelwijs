@@ -76,9 +76,9 @@ class HomeScreen extends StatelessWidget {
                       const Text(
                         'Wandelen wordt een avontuur',
                         style: TextStyle(
-                          fontFamily: 'Feijoada',
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Sniglet',
+                          fontSize: 18,
+                          fontWeight: FontWeight.normal,  // Changed to normal weight
                         ),
                         textAlign: TextAlign.center,
                       ),

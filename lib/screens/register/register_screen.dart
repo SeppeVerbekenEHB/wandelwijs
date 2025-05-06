@@ -189,9 +189,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const Text(
                           'Maak een nieuw account aan',
                           style: TextStyle(
-                            fontFamily: 'Feijoada',
+                            fontFamily: 'Sniglet',
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
                         ),

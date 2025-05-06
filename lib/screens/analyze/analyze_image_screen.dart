@@ -148,7 +148,7 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
       appBar: AppBar(
         title: const Text(
           'Analyseren',
-          style: TextStyle(fontFamily: 'Feijoada', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Sniglet'),
         ),
         backgroundColor: Colors.green[700],
       ),
@@ -213,7 +213,7 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
                                       'Even geduld, we analyseren de afbeelding...',
                                       style: TextStyle(
                                         fontSize: 16,
-                                        fontFamily: 'Feijoada',
+                                        fontFamily: 'Sniglet',
                                         color: Colors.green[700],
                                       ),
                                       textAlign: TextAlign.center,
@@ -233,8 +233,7 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
                                         _speciesName,
                                         style: TextStyle(
                                           fontSize: 28,
-                                          fontFamily: 'Feijoada',
-                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Sniglet',
                                           color: Colors.green[700],
                                         ),
                                         textAlign: TextAlign.center,
@@ -254,7 +253,7 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
                                             _speciesType,
                                             style: TextStyle(
                                               fontSize: 16,
-                                              fontFamily: 'Feijoada',
+                                              fontFamily: 'Sniglet',
                                               color: Colors.green[800],
                                             ),
                                           ),
@@ -264,7 +263,7 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
                                         'Is deze identificatie correct?',
                                         style: TextStyle(
                                           fontSize: 16,
-                                          fontFamily: 'Feijoada',
+                                          fontFamily: 'Sniglet',
                                           color: Colors.grey[800],
                                         ),
                                       ),
@@ -287,9 +286,8 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
                                               child: Text(
                                                 'Nee, opnieuw',
                                                 style: TextStyle(
-                                                  fontFamily: 'Feijoada',
+                                                  fontFamily: 'Sniglet',
                                                   fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
                                                   color: Colors.green[600],
                                                 ),
                                               ),
@@ -309,9 +307,8 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
                                               child: const Text(
                                                 'Ja, correct',
                                                 style: TextStyle(
-                                                  fontFamily: 'Feijoada',
+                                                  fontFamily: 'Sniglet',
                                                   fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
                                                   color: Colors.white,
                                                 ),
                                               ),

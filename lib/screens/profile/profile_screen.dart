@@ -22,7 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text(
           'Mijn Profiel',
-          style: TextStyle(fontFamily: 'Feijoada', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Sniglet'),
         ),
         backgroundColor: Colors.green[700],
       ),
@@ -56,32 +56,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       user?.displayName ?? 'Wandelaar',
                       style: const TextStyle(
                         fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Feijoada',
+                        fontFamily: 'Sniglet',
                       ),
                     ),
                     Text(
                       user?.email ?? 'Geen e-mail',
                       style: const TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Feijoada',
+                        fontFamily: 'Sniglet',
                       ),
                     ),
                     const SizedBox(height: 30),
                     const ListTile(
                       leading: Icon(Icons.hiking, color: Colors.green),
-                      title: Text('Wandelingen', style: TextStyle(fontFamily: 'Feijoada')),
-                      trailing: Text('0', style: TextStyle(fontFamily: 'Feijoada')),
+                      title: Text('Wandelingen', style: TextStyle(fontFamily: 'Sniglet')),
+                      trailing: Text('0', style: TextStyle(fontFamily: 'Sniglet')),
                     ),
                     const ListTile(
                       leading: Icon(Icons.emoji_events, color: Colors.green),
-                      title: Text('Voltooide Missies', style: TextStyle(fontFamily: 'Feijoada')),
-                      trailing: Text('0', style: TextStyle(fontFamily: 'Feijoada')),
+                      title: Text('Voltooide Missies', style: TextStyle(fontFamily: 'Sniglet')),
+                      trailing: Text('0', style: TextStyle(fontFamily: 'Sniglet')),
                     ),
                     const ListTile(
                       leading: Icon(Icons.photo_album, color: Colors.green),
-                      title: Text('Verzamelde Items', style: TextStyle(fontFamily: 'Feijoada')),
-                      trailing: Text('0', style: TextStyle(fontFamily: 'Feijoada')),
+                      title: Text('Verzamelde Items', style: TextStyle(fontFamily: 'Sniglet')),
+                      trailing: Text('0', style: TextStyle(fontFamily: 'Sniglet')),
                     ),
                   ],
                 ),
