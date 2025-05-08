@@ -147,8 +147,8 @@ class HomeScreen extends StatelessWidget {
                       child: const Text(
                         'Missies',
                         style: TextStyle(
+                          fontFamily: 'Sniglet',
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
@@ -172,8 +172,8 @@ class HomeScreen extends StatelessWidget {
                       child: const Text(
                         'Album',
                         style: TextStyle(
+                          fontFamily: 'Sniglet',
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
@@ -205,8 +205,8 @@ class HomeScreen extends StatelessWidget {
           child: const Text(
             'SCAN',
             style: TextStyle(
+              fontFamily: 'Sniglet',
               fontSize: 28,
-              fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
