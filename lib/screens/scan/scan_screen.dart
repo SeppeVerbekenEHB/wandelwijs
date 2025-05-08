@@ -253,7 +253,23 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
               child: Column(
                 children: [
                   const Spacer(),
-                  // Text floats above the camera
+                  // Button now placed above the text
+                  ElevatedButton(
+                    onPressed: _isCameraInitialized ? _toggleScan : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green[700],
+                      padding: const EdgeInsets.all(16),
+                      shape: const CircleBorder(),
+                      elevation: 8,
+                    ),
+                    child: Icon(
+                      _isScanning ? Icons.stop_rounded : Icons.camera_alt_rounded,
+                      size: 36,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Text now appears below the button
                   const Text(
                     'Richt je camera op een voorwerp in de natuur',
                     style: TextStyle(
@@ -269,27 +285,6 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
                       ],
                     ),
                     textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  // Button floats above the camera
-                  ElevatedButton(
-                    onPressed: _isCameraInitialized ? _toggleScan : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[700],
-                      padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      elevation: 8,
-                    ),
-                    child: Text(
-                      _isScanning ? 'STOP' : 'START SCAN',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
                   ),
                   const SizedBox(height: 40),
                 ],
