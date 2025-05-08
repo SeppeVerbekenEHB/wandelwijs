@@ -56,8 +56,11 @@ class _LoginScreenState extends State<LoginScreen> {
   ){
     return TextFormField(
       controller: controller,
+      style: const TextStyle(fontFamily: 'Sniglet'),
       decoration: InputDecoration(
         labelText: title,
+        labelStyle: const TextStyle(fontFamily: 'Sniglet'),
+        errorStyle: const TextStyle(fontFamily: 'Sniglet'),
         border: OutlineInputBorder(),
         prefixIcon: icon != null ? Icon(icon) : null,
       ),
@@ -69,7 +72,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _errorMessage(){
     return Text(
       errorMessage == '' ? '' : 'Hmmmm? $errorMessage',
-      style: TextStyle(color: Colors.red),
+      style: TextStyle(
+        fontFamily: 'Sniglet',
+        color: Colors.red
+      ),
     );
   }
 
@@ -92,6 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text(
                 text,
                 style: TextStyle(
+                  fontFamily: 'Sniglet',
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -108,6 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text(
                 text,
                 style: TextStyle(
+                  fontFamily: 'Sniglet',
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.green[800],
@@ -215,7 +223,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () {
                             // Handle forgot password
                           },
-                          child: const Text('Wachtwoord vergeten?'),
+                          child: const Text(
+                            'Wachtwoord vergeten?',
+                            style: TextStyle(
+                              fontFamily: 'Sniglet',
+                            ),
+                          ),
                         ),
                         const Divider(),
                         const SizedBox(height: 8),
