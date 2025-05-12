@@ -138,19 +138,14 @@ class HomeScreen extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green[700],
-                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                        padding: const EdgeInsets.all(16),
+                        shape: const CircleBorder(),
                         elevation: 5,
                       ),
-                      child: const Text(
-                        'Missies',
-                        style: TextStyle(
-                          fontFamily: 'Sniglet',
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
+                      child: const Icon(
+                        Icons.flag_rounded,
+                        size: 36,
+                        color: Colors.white,
                       ),
                     ),
                     // Album button (right)
@@ -163,19 +158,14 @@ class HomeScreen extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green[700],
-                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+                        padding: const EdgeInsets.all(16),
+                        shape: const CircleBorder(),
                         elevation: 5,
                       ),
-                      child: const Text(
-                        'Album',
-                        style: TextStyle(
-                          fontFamily: 'Sniglet',
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
+                      child: const Icon(
+                        Icons.photo_album_rounded,
+                        size: 36,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -196,19 +186,14 @@ class HomeScreen extends StatelessWidget {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green[700],
-            padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
+            padding: const EdgeInsets.all(20),
+            shape: const CircleBorder(),
             elevation: 8,
           ),
-          child: const Text(
-            'SCAN',
-            style: TextStyle(
-              fontFamily: 'Sniglet',
-              fontSize: 28,
-              color: Colors.white,
-            ),
+          child: const Icon(
+            Icons.camera_alt_rounded,
+            size: 45,
+            color: Colors.white,
           ),
         ),
       ),

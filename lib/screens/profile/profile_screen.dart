@@ -69,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 30),
                     const ListTile(
                       leading: Icon(Icons.hiking, color: Colors.green),
-                      title: Text('Wandelingen', style: TextStyle(fontFamily: 'Sniglet')),
+                      title: Text('Stappen', style: TextStyle(fontFamily: 'Sniglet')),
                       trailing: Text('0', style: TextStyle(fontFamily: 'Sniglet')),
                     ),
                     const ListTile(
