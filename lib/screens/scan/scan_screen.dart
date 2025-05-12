@@ -218,23 +218,8 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       );
     }
 
-    // Calculate aspect ratio to ensure camera fills the container completely
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16), // Slightly smaller to ensure no white edges
-        child: Transform.scale(
-          scale: 1.01, // Very slight scale to ensure no gaps at borders
-          child: Center(
-            child: AspectRatio(
-              aspectRatio: 1 / _cameraController!.value.aspectRatio,
-              child: CameraPreview(_cameraController!),
-            ),
-          ),
-        ),
-      ),
-    );
+    // Make camera fill the entire container without any borders or margins
+    return CameraPreview(_cameraController!);
   }
 
   @override
@@ -243,81 +228,70 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       appBar: AppBar(
         title: const Text(
           'Scannen',
-          style: TextStyle(fontFamily: 'Feijoada', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Sniglet'),
         ),
         backgroundColor: Colors.green[700],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/Seamlessbackground.png'),
-            fit: BoxFit.cover,
+      body: Stack(
+        children: [
+          // Camera fills the entire screen
+          Positioned.fill(
+            child: _buildCameraPreview(),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 56), //top padding
-              Expanded(
-                flex: 5,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: _isScanning ? Colors.green : Colors.white,
-                      width: 4,
+          
+          // Semi-transparent overlay (optional, for better text readability)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.2),
+            ),
+          ),
+          
+          // Content that floats over the camera
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                children: [
+                  const Spacer(),
+                  // Button now placed above the text
+                  ElevatedButton(
+                    onPressed: _isCameraInitialized ? _toggleScan : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green[700],
+                      padding: const EdgeInsets.all(16),
+                      shape: const CircleBorder(),
+                      elevation: 8,
+                    ),
+                    child: Icon(
+                      _isScanning ? Icons.stop_rounded : Icons.camera_alt_rounded,
+                      size: 36,
+                      color: Colors.white,
                     ),
                   ),
-                  clipBehavior: Clip.hardEdge, // Ensure content is clipped to border
-                  child: _buildCameraPreview(),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 25),
-                      const Text(
-                        'Richt je camera op een voorwerp in de natuur',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontFamily: 'Feijoada',
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 16),
+                  // Text now appears below the button
+                  const Text(
+                    'Richt je camera op een voorwerp in de natuur',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'Sniglet',
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(1.0, 1.0),
+                          blurRadius: 3.0,
+                          color: Color.fromARGB(255, 0, 0, 0),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _isCameraInitialized ? _toggleScan : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[700],
-                          padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          elevation: 8,
-                        ),
-                        child: Text(
-                          _isScanning ? 'STOP' : 'START SCAN',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
+                  const SizedBox(height: 40),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

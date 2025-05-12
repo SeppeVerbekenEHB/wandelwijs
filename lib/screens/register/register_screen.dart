@@ -31,8 +31,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   ){
     return TextFormField(
       controller: controller,
+      style: const TextStyle(fontFamily: 'Sniglet'),
       decoration: InputDecoration(
         labelText: title,
+        labelStyle: const TextStyle(fontFamily: 'Sniglet'),
+        errorStyle: const TextStyle(fontFamily: 'Sniglet'),
         border: OutlineInputBorder(),
         prefixIcon: icon != null ? Icon(icon) : null,
       ),
@@ -44,7 +47,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _errorMessage(){
     return Text(
       errorMessage == '' ? '' : 'Fout: $errorMessage',
-      style: const TextStyle(color: Colors.red),
+      style: const TextStyle(
+        fontFamily: 'Sniglet',
+        color: Colors.red
+      ),
     );
   }
 
@@ -65,6 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Text(
               text,
               style: TextStyle(
+                fontFamily: 'Sniglet',
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -81,6 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Text(
               text,
               style: TextStyle(
+                fontFamily: 'Sniglet',
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.green[800],
@@ -189,9 +197,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const Text(
                           'Maak een nieuw account aan',
                           style: TextStyle(
-                            fontFamily: 'Feijoada',
+                            fontFamily: 'Sniglet',
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -263,7 +270,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onPressed: () {
                             Navigator.pushReplacementNamed(context, AppRoutes.login);
                           },
-                          child: const Text('Al een account? Inloggen'),
+                          child: const Text(
+                            'Al een account? Inloggen',
+                            style: TextStyle(
+                              fontFamily: 'Sniglet',
+                            ),
+                          ),
                         ),
                       ],
                     ),

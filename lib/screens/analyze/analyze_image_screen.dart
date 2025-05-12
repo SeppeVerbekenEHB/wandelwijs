@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
 import '../../config/api_config.dart';
+import '../verify/verify_discovery_screen.dart';
 
 class AnalyzeImageScreen extends StatefulWidget {
   final XFile imageFile;
@@ -18,7 +19,8 @@ class AnalyzeImageScreen extends StatefulWidget {
 class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTickerProviderStateMixin {
   bool _isLoading = true;
   String _result = "";
-  String _detectedObject = "";
+  String _speciesName = "";
+  String _speciesType = "";
   late AnimationController _animationController;
   
   @override
@@ -42,7 +44,6 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
     try {
       final apiKey = ApiConfig.openaiApiKey;
       
-      
       // Convert image file to base64
       final bytes = await widget.imageFile.readAsBytes();
       final base64Image = base64Encode(bytes);
@@ -59,8 +60,11 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
             {
               'role': 'system',
               'content': 'You are a nature identification assistant that helps identify plants, trees, or animals in images. '
-                  'If you can identify the object, provide its common name in Dutch, followed by its scientific name, '
-                  'and a brief description of its characteristics. If you cannot identify it with certainty, just say "Niet herkend".'
+                  'Tell me what type of plant, tree or animal is in this image. '
+                  'If you detected more then 1 object in the image, give me the respons of what you are most certain about. Do not use scientific names, only simple names of species. '
+                  'your response should look like this: species - Boom/Plant/Dier '
+                  'the species name shoudl be in common dutch names, not in latin or english. '
+                  'If you cannot identify it with certainty, just say "Niet herkend".'
             },
             {
               'role': 'user',
@@ -86,16 +90,20 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
         final jsonResponse = jsonDecode(response.body);
         final content = jsonResponse['choices'][0]['message']['content'];
         
-        // Parse the result to extract the name of the detected object
-        String detectedObject = 'Onbekend object';
+        // Parse the result to extract species name and type
+        String speciesName = 'Niet herkend';
+        String speciesType = '';
+        
         if (content != null && content.isNotEmpty) {
-          // Assuming the first line contains the name
+          // Extract from format "SpeciesName - Type"
           final lines = content.split('\n');
           if (lines.isNotEmpty) {
-            detectedObject = lines[0].replaceAll(RegExp(r'[^a-zA-Z0-9\s]'), '').trim();
-            // If it's longer than a typical name, take just the first few words
-            if (detectedObject.split(' ').length > 3) {
-              detectedObject = detectedObject.split(' ').take(2).join(' ');
+            final parts = lines[0].split('-');
+            if (parts.length >= 2) {
+              speciesName = parts[0].trim();
+              speciesType = parts[1].trim();
+            } else {
+              speciesName = lines[0].trim();
             }
           }
         }
@@ -103,7 +111,8 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
         setState(() {
           _isLoading = false;
           _result = content;
-          _detectedObject = detectedObject;
+          _speciesName = speciesName;
+          _speciesType = speciesType;
         });
       } else {
         setState(() {
@@ -120,13 +129,26 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
     }
   }
   
+  void _verifyAndContinue() {
+    // Navigate to the verify discovery screen with the species information
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VerifyDiscoveryScreen(
+          speciesName: _speciesName,
+          category: _speciesType,
+          imageFile: widget.imageFile,
+        ),
+      ),
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Analyseren',
-          style: TextStyle(fontFamily: 'Feijoada', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Sniglet'),
         ),
         backgroundColor: Colors.green[700],
       ),
@@ -191,7 +213,7 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
                                       'Even geduld, we analyseren de afbeelding...',
                                       style: TextStyle(
                                         fontSize: 16,
-                                        fontFamily: 'Feijoada',
+                                        fontFamily: 'Sniglet',
                                         color: Colors.green[700],
                                       ),
                                       textAlign: TextAlign.center,
@@ -199,60 +221,106 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
                                   ],
                                 ),
                               )
-                            : Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(20),
-                                  width: double.infinity,
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _detectedObject,
-                                          style: TextStyle(
-                                            fontSize: 22,
-                                            fontFamily: 'Feijoada',
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.green[700],
+                            : Container(
+                                padding: const EdgeInsets.all(20),
+                                width: double.infinity,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        _speciesName,
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          fontFamily: 'Sniglet',
+                                          color: Colors.green[700],
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      if (_speciesType.isNotEmpty)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green[100],
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Text(
+                                            _speciesType,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontFamily: 'Sniglet',
+                                              color: Colors.green[800],
+                                            ),
                                           ),
                                         ),
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          _result,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: 'Feijoada',
-                                          ),
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        'Is deze identificatie correct?',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Sniglet',
+                                          color: Colors.grey[800],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Expanded(
+                                            child: OutlinedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              style: OutlinedButton.styleFrom(
+                                                side: BorderSide(color: Colors.green[600]!, width: 2),
+                                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Nee, opnieuw',
+                                                style: TextStyle(
+                                                  fontFamily: 'Sniglet',
+                                                  fontSize: 18,
+                                                  color: Colors.green[600],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 16),
+                                          Expanded(
+                                            child: ElevatedButton(
+                                              onPressed: _verifyAndContinue,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green[600],
+                                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                              ),
+                                              child: const Text(
+                                                'Ja, correct',
+                                                style: TextStyle(
+                                                  fontFamily: 'Sniglet',
+                                                  fontSize: 18,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                       ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[700],
-                    padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    elevation: 8,
-                  ),
-                  child: const Text(
-                    'Terug',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontFamily: 'Feijoada',
                     ),
                   ),
                 ),
