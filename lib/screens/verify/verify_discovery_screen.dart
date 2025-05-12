@@ -191,9 +191,13 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_isNewDiscovery 
-              ? 'Nieuwe ontdekking succesvol opgeslagen!'
-              : 'Je hebt ${_pointsValue} punten ontvangen!'
+            content: Text(
+              _isNewDiscovery 
+                ? 'Nieuwe ontdekking succesvol opgeslagen!'
+                : 'Je hebt ${_pointsValue} punten ontvangen!',
+              style: const TextStyle(
+                fontFamily: 'Sniglet', // Changed font to Sniglet
+              ),
             ),
             backgroundColor: Colors.green[700],
           )
