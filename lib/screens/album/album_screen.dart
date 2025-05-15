@@ -128,53 +128,72 @@ class _AlbumScreenState extends State<AlbumScreen> {
 
   // Method to show species details in a popup dialog
   void _showSpeciesDetails(Map<String, dynamic> item, IconData categoryIcon) {
+    bool isExpanded = false; // Add this at the start of the method
+    
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Species name header
-                  Text(
-                    item['name'],
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'Sniglet',
-                      color: Color(0xFF4785D2),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Image section - prioritize user's discovered image
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: item['discoveredImagePath'] != null
-                      ? Image.file(
-                          File(item['discoveredImagePath']),
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            // Fallback to database image if file not found
-                            return item['image'] != null 
-                              ? Image.network(
-                                  item['image'],
-                                  height: 200,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
+        return StatefulBuilder( // Wrap Dialog with StatefulBuilder to manage state
+          builder: (context, setState) {
+            final description = item['description'] != '' 
+              ? item['description'] 
+              : 'Geen beschrijving beschikbaar voor deze soort.';
+            
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Species name header
+                      Text(
+                        item['name'],
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontFamily: 'Sniglet',
+                          color: Color(0xFF4785D2),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Image section - prioritize user's discovered image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: item['discoveredImagePath'] != null
+                          ? Image.file(
+                              File(item['discoveredImagePath']),
+                              height: 200,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Fallback to database image if file not found
+                                return item['image'] != null 
+                                  ? Image.network(
+                                      item['image'],
+                                      height: 200,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          height: 200,
+                                          color: Colors.green[100],
+                                          child: Icon(
+                                            categoryIcon,
+                                            size: 80,
+                                            color: Colors.green[700],
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : Container(
                                       height: 200,
                                       color: Colors.green[100],
                                       child: Icon(
@@ -183,27 +202,27 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                         color: Colors.green[700],
                                       ),
                                     );
-                                  },
-                                )
-                              : Container(
-                                  height: 200,
-                                  color: Colors.green[100],
-                                  child: Icon(
-                                    categoryIcon,
-                                    size: 80,
-                                    color: Colors.green[700],
-                                  ),
-                                );
-                          },
-                        )
-                      : item['image'] != null 
-                        ? Image.network(
-                            item['image'],
-                            height: 200,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
+                              },
+                            )
+                          : item['image'] != null 
+                            ? Image.network(
+                                item['image'],
+                                height: 200,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 200,
+                                    color: Colors.green[100],
+                                    child: Icon(
+                                      categoryIcon,
+                                      size: 80,
+                                      color: Colors.green[700],
+                                    ),
+                                  );
+                                },
+                              )
+                            : Container(
                                 height: 200,
                                 color: Colors.green[100],
                                 child: Icon(
@@ -211,85 +230,97 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                   size: 80,
                                   color: Colors.green[700],
                                 ),
-                              );
-                            },
-                          )
-                        : Container(
-                            height: 200,
-                            color: Colors.green[100],
-                            child: Icon(
-                              categoryIcon,
-                              size: 80,
-                              color: Colors.green[700],
+                              ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Points display
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            "${item['points']} punten",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: 'Sniglet',
+                              color: Colors.green[800],
                             ),
                           ),
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Points display
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                        size: 24,
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "${item['points']} punten",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontFamily: 'Sniglet',
-                          color: Colors.green[800],
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Description text
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            description,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Sniglet',
+                              color: Colors.grey[800],
+                            ),
+                            textAlign: TextAlign.left,
+                            maxLines: isExpanded ? null : 3,
+                            overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                          ),
+                          if (description.length > 100) // Only show button if text is long
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  isExpanded = !isExpanded;
+                                });
+                              },
+                              child: Text(
+                                isExpanded ? 'Minder' : 'Meer',
+                                style: TextStyle(
+                                  color: Colors.green[700],
+                                  fontFamily: 'Sniglet',
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // Close button
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.green[600],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text(
+                          'Sluiten',
+                          style: TextStyle(
+                            fontFamily: 'Sniglet',
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Description text
-                  Text(
-                    item['description'] != '' 
-                      ? item['description'] 
-                      : 'Geen beschrijving beschikbaar voor deze soort.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Sniglet',
-                      color: Colors.grey[800],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  
-                  const SizedBox(height: 20),
-                  
-                  // Close button
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.green[600],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text(
-                      'Sluiten',
-                      style: TextStyle(
-                        fontFamily: 'Sniglet',
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
