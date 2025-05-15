@@ -262,16 +262,26 @@ class _AlbumScreenState extends State<AlbumScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            description,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Sniglet',
-                              color: Colors.grey[800],
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: isExpanded ? 320 : 80, // Higher when expanded
                             ),
-                            textAlign: TextAlign.left,
-                            maxLines: isExpanded ? null : 3,
-                            overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                            child: SingleChildScrollView(
+                              physics: isExpanded 
+                                ? const AlwaysScrollableScrollPhysics() 
+                                : const NeverScrollableScrollPhysics(),
+                              child: Text(
+                                description,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Sniglet',
+                                  color: Colors.grey[800],
+                                ),
+                                textAlign: TextAlign.left,
+                                maxLines: isExpanded ? null : 4,
+                                overflow: isExpanded ? TextOverflow.visible : TextOverflow.fade,
+                              ),
+                            ),
                           ),
                           if (description.length > 100) // Only show button if text is long
                             TextButton(
