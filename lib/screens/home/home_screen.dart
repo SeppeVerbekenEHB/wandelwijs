@@ -87,38 +87,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // profile button at the top center
-            Positioned(
-              top: 80,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.green[700],
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                      );
-                    },
-                    icon: const Icon(Icons.person, color: Colors.white, size: 28),
-                    padding: const EdgeInsets.all(12),
-                  ),
-                ),
-              ),
-            ),
             Positioned(
               bottom: 30,
               left: 0,
@@ -126,7 +94,7 @@ class HomeScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     // Missies button (left)
                     ElevatedButton(
@@ -144,6 +112,26 @@ class HomeScreen extends StatelessWidget {
                       ),
                       child: const Icon(
                         Icons.flag_rounded,
+                        size: 36,
+                        color: Colors.white,
+                      ),
+                    ),
+                    // Profile button (center)
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[700],
+                        padding: const EdgeInsets.all(16),
+                        shape: const CircleBorder(),
+                        elevation: 5,
+                      ),
+                      child: const Icon(
+                        Icons.person,
                         size: 36,
                         color: Colors.white,
                       ),
@@ -186,13 +174,13 @@ class HomeScreen extends StatelessWidget {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green[700],
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24), // Increased padding
             shape: const CircleBorder(),
             elevation: 8,
           ),
           child: const Icon(
             Icons.camera_alt_rounded,
-            size: 45,
+            size: 52, // Increased icon size
             color: Colors.white,
           ),
         ),

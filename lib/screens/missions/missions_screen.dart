@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../models/mission_model.dart';
 import '../../services/mission_service.dart';
+import '../scan/scan_screen.dart';
+import '../album/album_screen.dart';
 
 class MissionsScreen extends StatefulWidget {
   const MissionsScreen({super.key});
@@ -37,22 +39,23 @@ class _MissionsScreenState extends State<MissionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Missies',
-          style: TextStyle(fontFamily: 'Sniglet'),
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/Seamlessbackground.png'),
+          fit: BoxFit.cover,
         ),
-        backgroundColor: Colors.green[700],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/Seamlessbackground.png'),
-            fit: BoxFit.cover,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text(
+            'Missies',
+            style: TextStyle(fontFamily: 'Sniglet'),
           ),
+          backgroundColor: Colors.green[700],
         ),
-        child: Padding(
+        body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,6 +211,70 @@ class _MissionsScreenState extends State<MissionsScreen> {
                         );
                       },
                     ),
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ScanScreen()),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green[700],
+            padding: const EdgeInsets.all(24),
+            shape: const CircleBorder(),
+            elevation: 8,
+          ),
+          child: const Icon(
+            Icons.camera_alt_rounded,
+            size: 52,
+            color: Colors.white,
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(bottom: 30.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // Missions button (left) - disabled since we're on missions screen
+              ElevatedButton(
+                onPressed: null, // Disabled
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[400],
+                  padding: const EdgeInsets.all(16),
+                  shape: const CircleBorder(),
+                  elevation: 0,
+                ),
+                child: const Icon(
+                  Icons.flag_rounded,
+                  size: 36,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 80), // Space for scan button
+              // Album button (right)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AlbumScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[700],
+                  padding: const EdgeInsets.all(16),
+                  shape: const CircleBorder(),
+                  elevation: 5,
+                ),
+                child: const Icon(
+                  Icons.photo_album_rounded,
+                  size: 36,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
+import '../scan/scan_screen.dart';
+import '../missions/missions_screen.dart';
 
 class AlbumScreen extends StatefulWidget {
   const AlbumScreen({super.key});
@@ -338,22 +340,23 @@ class _AlbumScreenState extends State<AlbumScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Verzamelalbum',
-          style: TextStyle(fontFamily: 'Sniglet'),
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/Seamlessbackground.png'),
+          fit: BoxFit.cover,
         ),
-        backgroundColor: Colors.green[700],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/Seamlessbackground.png'),
-            fit: BoxFit.cover,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text(
+            'Verzamelalbum',
+            style: TextStyle(fontFamily: 'Sniglet'),
           ),
+          backgroundColor: Colors.green[700],
         ),
-        child: _isLoading 
+        body: _isLoading 
           ? Center(
               child: CircularProgressIndicator(
                 color: Colors.green[700],
@@ -620,6 +623,70 @@ class _AlbumScreenState extends State<AlbumScreen> {
                   ),
                 ],
               ),
+        floatingActionButton: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ScanScreen()),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green[700],
+            padding: const EdgeInsets.all(24),
+            shape: const CircleBorder(),
+            elevation: 8,
+          ),
+          child: const Icon(
+            Icons.camera_alt_rounded,
+            size: 52,
+            color: Colors.white,
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(bottom: 30.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // Missions button (left)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MissionsScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[700],
+                  padding: const EdgeInsets.all(16),
+                  shape: const CircleBorder(),
+                  elevation: 5,
+                ),
+                child: const Icon(
+                  Icons.flag_rounded,
+                  size: 36,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 80), // Space for scan button
+              // Album button (right) - disabled since we're on album screen
+              ElevatedButton(
+                onPressed: null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[400],
+                  padding: const EdgeInsets.all(16),
+                  shape: const CircleBorder(),
+                  elevation: 0,
+                ),
+                child: const Icon(
+                  Icons.photo_album_rounded,
+                  size: 36,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
