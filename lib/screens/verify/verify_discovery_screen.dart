@@ -185,6 +185,8 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
       // Update missions if this is a new discovery
       if (_isNewDiscovery) {
         await _missionService.updateMissionsForDiscovery(widget.category, widget.speciesName);
+        // Show mission progress dialog
+        await _showMissionProgressDialog(widget.category);
       }
       
       // Show success message with different text based on whether it's a new discovery
@@ -223,6 +225,114 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
         );
       }
     }
+  }
+
+  // Add this new function to show mission progress
+  Future<void> _showMissionProgressDialog(String category) async {
+    // Get missions that match the category
+    final missions = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('missions')
+        .where('type', whereIn: [
+          if (category.toLowerCase().contains('boom')) 'Boom',
+          if (category.toLowerCase().contains('dier') ||
+              category.toLowerCase().contains('vogel') ||
+              category.toLowerCase().contains('insect')) 'Dier',
+          if (category.toLowerCase().contains('plant')) 'Plant',
+        ])
+        .get();
+
+    if (!mounted || missions.docs.isEmpty) return;
+
+    // Show overlay
+    OverlayEntry overlayEntry = OverlayEntry(
+      builder: (context) => Material(
+        color: Colors.black54,
+        child: Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Missie Voortgang',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontFamily: 'Sniglet',
+                    color: Color(0xFF4785D2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ...missions.docs.map((doc) {
+                  final data = doc.data();
+                  final progress = data['progress'] as int;
+                  final total = data['total'] as int;
+                  final title = data['title'] as String;
+                  final completed = progress >= total;
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'Sniglet',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TweenAnimationBuilder(
+                          duration: const Duration(milliseconds: 1000),
+                          tween: Tween<double>(
+                            begin: (progress - 1) / total,
+                            end: progress / total,
+                          ),
+                          builder: (context, double value, child) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                LinearProgressIndicator(
+                                  value: value,
+                                  backgroundColor: Colors.grey[300],
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    completed ? Colors.amber : Colors.green[700]!,
+                                  ),
+                                  minHeight: 10,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '$progress/$total',
+                                  style: const TextStyle(fontFamily: 'Sniglet'),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Insert overlay and remove after animation
+    Overlay.of(context).insert(overlayEntry);
+    
+    // Wait for animation and a bit more before removing
+    await Future.delayed(const Duration(milliseconds: 2000));
+    overlayEntry.remove();
   }
 
   @override
@@ -375,7 +485,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                                     Text(
                                       "$_pointsValue punten",
                                       style: const TextStyle(
-                                        fontSize: 26,
+                                        fontSize: 22,
                                         fontFamily: 'Sniglet',
                                       ),
                                     ),
