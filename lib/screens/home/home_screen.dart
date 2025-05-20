@@ -6,6 +6,8 @@ import '../../screens/profile/profile_screen.dart';
 import '../../screens/missions/missions_screen.dart';
 import '../../screens/album/album_screen.dart';
 import '../../screens/scan/scan_screen.dart';
+import '../../services/mission_service.dart';
+import '../../models/mission_model.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -31,6 +33,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final MissionService _missionService = MissionService();
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -72,15 +76,57 @@ class HomeScreen extends StatelessWidget {
                           color: Colors.green[800],
                         ),
                       ),
-                      const SizedBox(height: 0),
+                      const SizedBox(height: 10),
                       const Text(
                         'Wandelen wordt een avontuur',
                         style: TextStyle(
                           fontFamily: 'Sniglet',
                           fontSize: 18,
-                          fontWeight: FontWeight.normal,  // Changed to normal weight
+                          fontWeight: FontWeight.normal,
                         ),
                         textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 60),
+                      // missions preview
+                      SizedBox(
+                        height: 150,
+                        child: StreamBuilder<List<MissionModel>>(
+                          stream: _missionService.getMissions(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+
+                            final missions = snapshot.data!;
+                            final incompleteMissions = missions
+                                .where((m) => !m.completed)
+                                .take(2)
+                                .toList();
+
+                            return Column(
+                              children: incompleteMissions.map((mission) => Card(
+                                margin: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 16,
+                                ),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: Colors.green[700],
+                                    child: Icon(mission.icon, color: Colors.white),
+                                  ),
+                                  title: Text(
+                                    mission.title,
+                                    style: const TextStyle(fontFamily: 'Sniglet'),
+                                  ),
+                                  trailing: Text(
+                                    '${mission.progress}/${mission.total}',
+                                    style: const TextStyle(fontFamily: 'Sniglet'),
+                                  ),
+                                ),
+                              )).toList(),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -174,13 +220,13 @@ class HomeScreen extends StatelessWidget {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green[700],
-            padding: const EdgeInsets.all(24), // Increased padding
+            padding: const EdgeInsets.all(24),
             shape: const CircleBorder(),
             elevation: 8,
           ),
           child: const Icon(
             Icons.camera_alt_rounded,
-            size: 52, // Increased icon size
+            size: 52,
             color: Colors.white,
           ),
         ),
