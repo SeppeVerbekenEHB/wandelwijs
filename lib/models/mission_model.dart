@@ -11,6 +11,7 @@ class MissionModel {
   final IconData icon;
   final bool completed;
   final int reward;
+  final List<String> discoveryIds; // New field
 
   MissionModel({
     required this.id,
@@ -22,6 +23,7 @@ class MissionModel {
     required this.icon,
     required this.completed,
     required this.reward,
+    this.discoveryIds = const [], // Default to empty list
   });
 
   // Convert Firestore document to MissionModel
@@ -47,6 +49,7 @@ class MissionModel {
       icon: iconMap[data['icon']] ?? Icons.emoji_events,
       completed: data['completed'] ?? false,
       reward: data['reward'] ?? 5,
+      discoveryIds: List<String>.from(data['discoveryIds'] ?? []), // Convert to List<String>
     );
   }
 
@@ -69,6 +72,7 @@ class MissionModel {
       'icon': iconString,
       'completed': completed,
       'reward': reward,
+      'discoveryIds': discoveryIds, // Add discoveryIds to the map
     };
   }
 
@@ -83,6 +87,7 @@ class MissionModel {
     IconData? icon,
     bool? completed,
     int? reward,
+    List<String>? discoveryIds,
   }) {
     return MissionModel(
       id: id ?? this.id,
@@ -94,6 +99,7 @@ class MissionModel {
       icon: icon ?? this.icon,
       completed: completed ?? this.completed,
       reward: reward ?? this.reward,
+      discoveryIds: discoveryIds ?? this.discoveryIds,
     );
   }
 }
