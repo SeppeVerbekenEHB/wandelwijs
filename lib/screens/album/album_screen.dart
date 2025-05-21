@@ -103,7 +103,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
           'name': name,
           'discovered': discovered,
           'image': imageUrl,
-          'discoveredImagePath': discoveredImagePath, // Add the discovered image path
+          'discoveredImagePath': discoveredImagePath,
           'description': data['description'] ?? '',
           'points': data['points'] ?? 5,
         };
@@ -131,12 +131,12 @@ class _AlbumScreenState extends State<AlbumScreen> {
 
   // Method to show species details in a popup dialog
   void _showSpeciesDetails(Map<String, dynamic> item, IconData categoryIcon) {
-    bool isExpanded = false; // Add this at the start of the method
+    bool isExpanded = false;
     
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder( // Wrap Dialog with StatefulBuilder to manage state
+        return StatefulBuilder(
           builder: (context, setState) {
             final description = item['description'] != '' 
               ? item['description'] 
@@ -267,7 +267,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                         children: [
                           ConstrainedBox(
                             constraints: BoxConstraints(
-                              maxHeight: isExpanded ? 320 : 80, // Higher when expanded
+                              maxHeight: isExpanded ? 320 : 80,
                             ),
                             child: SingleChildScrollView(
                               physics: isExpanded 
@@ -286,7 +286,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                               ),
                             ),
                           ),
-                          if (description.length > 100) // Only show button if text is long
+                          if (description.length > 100)
                             TextButton(
                               onPressed: () {
                                 setState(() {
@@ -367,7 +367,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
                   ),
                 ),
               )
-// ...existing code...
             : SafeArea(
                 child: Column(
                   children: [
@@ -406,7 +405,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
                         }),
                       ),
                     ),
-// ...existing code...
                     Expanded(
                       child: (_categories[_currentCategory]['items'] as List).isEmpty
                           ? Center(
@@ -437,7 +435,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                   child: Stack(
                                     fit: StackFit.expand,
                                     children: [
-                                      // Make discovered items clickable
                                       item['discovered']
                                           ? GestureDetector(
                                               onTap: () => _showSpeciesDetails(
@@ -464,7 +461,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                                                   ),
                                                                 );
                                                               },
-                                                              // Keep existing loading builder
                                                               loadingBuilder: (context, child, loadingProgress) {
                                                                 if (loadingProgress == null) return child;
                                                                 return Center(
@@ -491,7 +487,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                                       ? Image.network(
                                                           item['image'],
                                                           fit: BoxFit.cover,
-                                                          // Keep existing error and loading builders
                                                           errorBuilder: (context, error, stackTrace) {
                                                             return Container(
                                                               color: Colors.green[100],
@@ -524,7 +519,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                                         ))
                                             )
                                           : Container(
-                                              // Replace the simple lock with a silhouette design
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
                                                   begin: Alignment.topCenter,
@@ -535,7 +529,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                               child: Stack(
                                                 alignment: Alignment.center,
                                                 children: [
-                                                  // Show a larger, faded category icon as silhouette
                                                   Icon(
                                                     _categories[_currentCategory]['icon'],
                                                     size: 80,
@@ -569,7 +562,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
                                           padding: const EdgeInsets.all(8.0),
                                           color: Colors.black54,
                                           child: Text(
-                                            // For undiscovered species, use correct Dutch grammar
                                             item['discovered'] 
                                               ? item['name'] 
                                               : _currentCategory == 1 
@@ -657,8 +649,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 80), // Space for scan button
-              // Album button (right) - disabled since we're on album screen
+              const SizedBox(width: 80),
               ElevatedButton(
                 onPressed: null,
                 style: ElevatedButton.styleFrom(
