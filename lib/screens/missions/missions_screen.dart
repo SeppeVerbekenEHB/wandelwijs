@@ -236,15 +236,8 @@ class _MissionsScreenState extends State<MissionsScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          title: const Text(
-            'Missies',
-            style: TextStyle(fontFamily: 'Sniglet'),
-          ),
-          backgroundColor: Colors.green[700],
-        ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -350,13 +350,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          title: const Text(
-            'Verzamelalbum',
-            style: TextStyle(fontFamily: 'Sniglet'),
-          ),
-          backgroundColor: Colors.green[700],
-        ),
         body: _isLoading 
           ? Center(
               child: CircularProgressIndicator(
@@ -374,255 +367,257 @@ class _AlbumScreenState extends State<AlbumScreen> {
                   ),
                 ),
               )
-            : Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: SizedBox(
-                      height: 50,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _categories.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: ChoiceChip(
-                              label: Row(
-                                children: [
-                                  Icon(
-                                    _categories[index]['icon'],
-                                    color: _currentCategory == index
-                                        ? Colors.white
-                                        : Colors.green[700],
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    "${_categories[index]['name']} (${(_categories[index]['items'] as List).length})",
-                                    style: TextStyle(
-                                      fontFamily: 'Sniglet',
+            : SafeArea(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: SizedBox(
+                        height: 50,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _categories.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: ChoiceChip(
+                                label: Row(
+                                  children: [
+                                    Icon(
+                                      _categories[index]['icon'],
                                       color: _currentCategory == index
                                           ? Colors.white
                                           : Colors.green[700],
+                                      size: 20,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              selected: _currentCategory == index,
-                              selectedColor: Colors.green[700],
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  _currentCategory = selected ? index : _currentCategory;
-                                });
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: (_categories[_currentCategory]['items'] as List).isEmpty
-                        ? Center(
-                            child: Text(
-                              'Geen ${_categories[_currentCategory]['name'].toString().toLowerCase()} gevonden',
-                              style: TextStyle(
-                                fontFamily: 'Sniglet',
-                                fontSize: 18,
-                                color: Colors.green[700],
-                              ),
-                            ),
-                          )
-                        : GridView.builder(
-                            padding: const EdgeInsets.all(16.0),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                            ),
-                            itemCount: (_categories[_currentCategory]['items'] as List).length,
-                            itemBuilder: (context, index) {
-                              final item = _categories[_currentCategory]['items'][index];
-                              return Card(
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    // Make discovered items clickable
-                                    item['discovered']
-                                        ? GestureDetector(
-                                            onTap: () => _showSpeciesDetails(
-                                              item, 
-                                              _categories[_currentCategory]['icon'],
-                                            ),
-                                            child: (item['discoveredImagePath'] != null
-                                                ? Image.file(
-                                                    File(item['discoveredImagePath']),
-                                                    fit: BoxFit.cover,
-                                                    errorBuilder: (context, error, stackTrace) {
-                                                      // Fallback to database image or icon
-                                                      return item['image'] != null 
-                                                        ? Image.network(
-                                                            item['image'],
-                                                            fit: BoxFit.cover,
-                                                            errorBuilder: (context, error, stackTrace) {
-                                                              return Container(
-                                                                color: Colors.green[100],
-                                                                child: Icon(
-                                                                  _categories[_currentCategory]['icon'],
-                                                                  size: 50,
-                                                                  color: Colors.green[700],
-                                                                ),
-                                                              );
-                                                            },
-                                                            // Keep existing loading builder
-                                                            loadingBuilder: (context, child, loadingProgress) {
-                                                              if (loadingProgress == null) return child;
-                                                              return Center(
-                                                                child: CircularProgressIndicator(
-                                                                  color: Colors.green[700],
-                                                                  value: loadingProgress.expectedTotalBytes != null
-                                                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                                                      : null,
-                                                                ),
-                                                              );
-                                                            },
-                                                          )
-                                                        : Container(
-                                                            color: Colors.green[100],
-                                                            child: Icon(
-                                                              _categories[_currentCategory]['icon'],
-                                                              size: 50,
-                                                              color: Colors.green[700],
-                                                            ),
-                                                          );
-                                                    },
-                                                  )
-                                                : item['image'] != null
-                                                    ? Image.network(
-                                                        item['image'],
-                                                        fit: BoxFit.cover,
-                                                        // Keep existing error and loading builders
-                                                        errorBuilder: (context, error, stackTrace) {
-                                                          return Container(
-                                                            color: Colors.green[100],
-                                                            child: Icon(
-                                                              _categories[_currentCategory]['icon'],
-                                                              size: 50,
-                                                              color: Colors.green[700],
-                                                            ),
-                                                          );
-                                                        },
-                                                        loadingBuilder: (context, child, loadingProgress) {
-                                                          if (loadingProgress == null) return child;
-                                                          return Center(
-                                                            child: CircularProgressIndicator(
-                                                              color: Colors.green[700],
-                                                              value: loadingProgress.expectedTotalBytes != null
-                                                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                                                  : null,
-                                                            ),
-                                                          );
-                                                        },
-                                                      )
-                                                    : Container(
-                                                        color: Colors.green[100],
-                                                        child: Icon(
-                                                          _categories[_currentCategory]['icon'],
-                                                          size: 50,
-                                                          color: Colors.green[700],
-                                                        ),
-                                                      ))
-                                          )
-                                        : Container(
-                                            // Replace the simple lock with a silhouette design
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                begin: Alignment.topCenter,
-                                                end: Alignment.bottomCenter,
-                                                colors: [Colors.grey[200]!, Colors.grey[400]!],
-                                              ),
-                                            ),
-                                            child: Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                // Show a larger, faded category icon as silhouette
-                                                Icon(
-                                                  _categories[_currentCategory]['icon'],
-                                                  size: 80,
-                                                  color: Colors.grey[600]!.withOpacity(0.4),
-                                                ),
-                                                // Small lock icon in the corner
-                                                Positioned(
-                                                  top: 8,
-                                                  right: 8,
-                                                  child: Container(
-                                                    padding: const EdgeInsets.all(4),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.grey[600]!.withOpacity(0.7),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: const Icon(
-                                                      Icons.lock,
-                                                      color: Colors.white,
-                                                      size: 14,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                    Positioned(
-                                      bottom: 0,
-                                      left: 0,
-                                      right: 0,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8.0),
-                                        color: Colors.black54,
-                                        child: Text(
-                                          // For undiscovered species, use correct Dutch grammar
-                                          item['discovered'] 
-                                            ? item['name'] 
-                                            : _currentCategory == 1 
-                                                ? "Onbekend ${_getCategoryInDutch(_currentCategory)}" 
-                                                : "Onbekende ${_getCategoryInDutch(_currentCategory)}",
-                                          style: const TextStyle(
-                                            fontFamily: 'Sniglet',
-                                            color: Colors.white,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      "${_categories[index]['name']} (${(_categories[index]['items'] as List).length})",
+                                      style: TextStyle(
+                                        fontFamily: 'Sniglet',
+                                        color: _currentCategory == index
+                                            ? Colors.white
+                                            : Colors.green[700],
                                       ),
                                     ),
-                                    if (item['discovered'])
-                                      Positioned(
-                                        top: 8,
-                                        right: 8,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.green[700],
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Text(
-                                            "${item['points']}pt",
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
                                   ],
                                 ),
-                              );
-                            },
-                          ),
-                  ),
-                ],
+                                selected: _currentCategory == index,
+                                selectedColor: Colors.green[700],
+                                onSelected: (bool selected) {
+                                  setState(() {
+                                    _currentCategory = selected ? index : _currentCategory;
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: (_categories[_currentCategory]['items'] as List).isEmpty
+                          ? Center(
+                              child: Text(
+                                'Geen ${_categories[_currentCategory]['name'].toString().toLowerCase()} gevonden',
+                                style: TextStyle(
+                                  fontFamily: 'Sniglet',
+                                  fontSize: 18,
+                                  color: Colors.green[700],
+                                ),
+                              ),
+                            )
+                          : GridView.builder(
+                              padding: const EdgeInsets.all(16.0),
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                              ),
+                              itemCount: (_categories[_currentCategory]['items'] as List).length,
+                              itemBuilder: (context, index) {
+                                final item = _categories[_currentCategory]['items'][index];
+                                return Card(
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      // Make discovered items clickable
+                                      item['discovered']
+                                          ? GestureDetector(
+                                              onTap: () => _showSpeciesDetails(
+                                                item, 
+                                                _categories[_currentCategory]['icon'],
+                                              ),
+                                              child: (item['discoveredImagePath'] != null
+                                                  ? Image.file(
+                                                      File(item['discoveredImagePath']),
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (context, error, stackTrace) {
+                                                        // Fallback to database image or icon
+                                                        return item['image'] != null 
+                                                          ? Image.network(
+                                                              item['image'],
+                                                              fit: BoxFit.cover,
+                                                              errorBuilder: (context, error, stackTrace) {
+                                                                return Container(
+                                                                  color: Colors.green[100],
+                                                                  child: Icon(
+                                                                    _categories[_currentCategory]['icon'],
+                                                                    size: 50,
+                                                                    color: Colors.green[700],
+                                                                  ),
+                                                                );
+                                                              },
+                                                              // Keep existing loading builder
+                                                              loadingBuilder: (context, child, loadingProgress) {
+                                                                if (loadingProgress == null) return child;
+                                                                return Center(
+                                                                  child: CircularProgressIndicator(
+                                                                    color: Colors.green[700],
+                                                                    value: loadingProgress.expectedTotalBytes != null
+                                                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                                        : null,
+                                                                  ),
+                                                                );
+                                                              },
+                                                            )
+                                                          : Container(
+                                                              color: Colors.green[100],
+                                                              child: Icon(
+                                                                _categories[_currentCategory]['icon'],
+                                                                size: 50,
+                                                                color: Colors.green[700],
+                                                              ),
+                                                            );
+                                                      },
+                                                    )
+                                                  : item['image'] != null
+                                                      ? Image.network(
+                                                          item['image'],
+                                                          fit: BoxFit.cover,
+                                                          // Keep existing error and loading builders
+                                                          errorBuilder: (context, error, stackTrace) {
+                                                            return Container(
+                                                              color: Colors.green[100],
+                                                              child: Icon(
+                                                                _categories[_currentCategory]['icon'],
+                                                                size: 50,
+                                                                color: Colors.green[700],
+                                                              ),
+                                                            );
+                                                          },
+                                                          loadingBuilder: (context, child, loadingProgress) {
+                                                            if (loadingProgress == null) return child;
+                                                            return Center(
+                                                              child: CircularProgressIndicator(
+                                                                color: Colors.green[700],
+                                                                value: loadingProgress.expectedTotalBytes != null
+                                                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                                    : null,
+                                                              ),
+                                                            );
+                                                          },
+                                                        )
+                                                      : Container(
+                                                          color: Colors.green[100],
+                                                          child: Icon(
+                                                            _categories[_currentCategory]['icon'],
+                                                            size: 50,
+                                                            color: Colors.green[700],
+                                                          ),
+                                                        ))
+                                            )
+                                          : Container(
+                                              // Replace the simple lock with a silhouette design
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [Colors.grey[200]!, Colors.grey[400]!],
+                                                ),
+                                              ),
+                                              child: Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  // Show a larger, faded category icon as silhouette
+                                                  Icon(
+                                                    _categories[_currentCategory]['icon'],
+                                                    size: 80,
+                                                    color: Colors.grey[600]!.withOpacity(0.4),
+                                                  ),
+                                                  // Small lock icon in the corner
+                                                  Positioned(
+                                                    top: 8,
+                                                    right: 8,
+                                                    child: Container(
+                                                      padding: const EdgeInsets.all(4),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[600]!.withOpacity(0.7),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: const Icon(
+                                                        Icons.lock,
+                                                        color: Colors.white,
+                                                        size: 14,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                      Positioned(
+                                        bottom: 0,
+                                        left: 0,
+                                        right: 0,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(8.0),
+                                          color: Colors.black54,
+                                          child: Text(
+                                            // For undiscovered species, use correct Dutch grammar
+                                            item['discovered'] 
+                                              ? item['name'] 
+                                              : _currentCategory == 1 
+                                                  ? "Onbekend ${_getCategoryInDutch(_currentCategory)}" 
+                                                  : "Onbekende ${_getCategoryInDutch(_currentCategory)}",
+                                            style: const TextStyle(
+                                              fontFamily: 'Sniglet',
+                                              color: Colors.white,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                      if (item['discovered'])
+                                        Positioned(
+                                          top: 8,
+                                          right: 8,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green[700],
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Text(
+                                              "${item['points']}pt",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
               ),
         floatingActionButton: ElevatedButton(
           onPressed: () {
