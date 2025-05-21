@@ -6,6 +6,7 @@ import '../album/album_screen.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../home/home_screen.dart';
 
 class MissionsScreen extends StatefulWidget {
   const MissionsScreen({super.key});
@@ -407,9 +408,10 @@ class _MissionsScreenState extends State<MissionsScreen> {
         ),
         floatingActionButton: ElevatedButton(
           onPressed: () {
-            Navigator.push(
+            Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const ScanScreen()),
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
             );
           },
           style: ElevatedButton.styleFrom(
@@ -419,7 +421,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
             elevation: 8,
           ),
           child: const Icon(
-            Icons.camera_alt_rounded,
+            Icons.home_rounded,
             size: 52,
             color: Colors.white,
           ),

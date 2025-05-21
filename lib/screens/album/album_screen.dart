@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import '../scan/scan_screen.dart';
 import '../missions/missions_screen.dart';
+import '../home/home_screen.dart';
 
 class AlbumScreen extends StatefulWidget {
   const AlbumScreen({super.key});
@@ -625,9 +626,10 @@ class _AlbumScreenState extends State<AlbumScreen> {
               ),
         floatingActionButton: ElevatedButton(
           onPressed: () {
-            Navigator.push(
+            Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const ScanScreen()),
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
             );
           },
           style: ElevatedButton.styleFrom(
@@ -637,7 +639,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
             elevation: 8,
           ),
           child: const Icon(
-            Icons.camera_alt_rounded,
+            Icons.home_rounded,
             size: 52,
             color: Colors.white,
           ),
