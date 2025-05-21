@@ -28,7 +28,6 @@ class _MissionsScreenState extends State<MissionsScreen> {
 
   Future<void> _initializeMissions() async {
     try {
-      // Make sure missions are initialized for the user
       await _missionService.initializeMissions();
       setState(() {
         _isLoading = false;
@@ -425,9 +424,8 @@ class _MissionsScreenState extends State<MissionsScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // Missions button (left) - disabled since we're on missions screen
               ElevatedButton(
-                onPressed: null, // Disabled
+                onPressed: null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[400],
                   padding: const EdgeInsets.all(16),
@@ -440,7 +438,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 80), // Space for scan button
+              const SizedBox(width: 80),
               // Album button (right)
               ElevatedButton(
                 onPressed: () {
