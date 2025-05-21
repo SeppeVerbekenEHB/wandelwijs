@@ -367,54 +367,46 @@ class _AlbumScreenState extends State<AlbumScreen> {
                   ),
                 ),
               )
+// ...existing code...
             : SafeArea(
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: SizedBox(
-                        height: 50,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _categories.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: ChoiceChip(
-                                label: Row(
-                                  children: [
-                                    Icon(
-                                      _categories[index]['icon'],
-                                      color: _currentCategory == index
-                                          ? Colors.white
-                                          : Colors.green[700],
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      "${_categories[index]['name']} (${(_categories[index]['items'] as List).length})",
-                                      style: TextStyle(
-                                        fontFamily: 'Sniglet',
-                                        color: _currentCategory == index
-                                            ? Colors.white
-                                            : Colors.green[700],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                selected: _currentCategory == index,
-                                selectedColor: Colors.green[700],
-                                onSelected: (bool selected) {
-                                  setState(() {
-                                    _currentCategory = selected ? index : _currentCategory;
-                                  });
-                                },
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(_categories.length, (index) {
+                          final isSelected = _currentCategory == index;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _currentCategory = index;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: isSelected ? Colors.green[700] : Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                        ),
+                              child: Icon(
+                                _categories[index]['icon'],
+                                color: isSelected ? Colors.white : Colors.green[700],
+                                size: 32,
+                              ),
+                            ),
+                          );
+                        }),
                       ),
                     ),
+// ...existing code...
                     Expanded(
                       child: (_categories[_currentCategory]['items'] as List).isEmpty
                           ? Center(
