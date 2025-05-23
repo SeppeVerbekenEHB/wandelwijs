@@ -73,7 +73,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               style: TextStyle(
                 fontFamily: 'Sniglet',
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
               ),
             ),
           )
@@ -90,7 +89,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               style: TextStyle(
                 fontFamily: 'Sniglet',
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
                 color: Colors.green[800],
               ),
             ),

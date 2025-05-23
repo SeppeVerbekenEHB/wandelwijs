@@ -100,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(
                   fontFamily: 'Sniglet',
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
             )
@@ -117,7 +116,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(
                   fontFamily: 'Sniglet',
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
                   color: Colors.green[800],
                 ),
               ),
