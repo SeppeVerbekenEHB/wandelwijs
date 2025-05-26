@@ -171,7 +171,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(
                             fontFamily: 'RetroChild',
                             fontSize: 48,
-                            fontWeight: FontWeight.bold,
                             color: Colors.green[800],
                           ),
                         ),

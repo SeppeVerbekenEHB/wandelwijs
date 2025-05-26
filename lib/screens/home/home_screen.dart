@@ -72,7 +72,6 @@ class HomeScreen extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'RetroChild',
                           fontSize: 60,
-                          fontWeight: FontWeight.bold,
                           color: Colors.green[800],
                         ),
                       ),

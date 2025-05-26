@@ -187,7 +187,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: TextStyle(
                             fontFamily: 'RetroChild',
                             fontSize: 40,
-                            fontWeight: FontWeight.bold,
                             color: Colors.green[800],
                           ),
                         ),
