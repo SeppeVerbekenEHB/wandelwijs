@@ -19,7 +19,6 @@ class HomeScreen extends StatelessWidget {
   Future<void> signOut(BuildContext context) async {
     try {
       await Auth().signOut();
-      // Navigate to login page after successful sign out
       Navigator.pushReplacementNamed(context, AppRoutes.login);
     } catch (e) {
       print('Error signing out: $e');
@@ -58,6 +57,40 @@ class HomeScreen extends StatelessWidget {
         ),
         child: Stack(
           children: [
+            // Decorative images
+            Positioned(
+              top: 80,
+              left: -8,
+              child: Transform.rotate(
+                angle: 0.42, // ~15 degrees
+                child: Image.asset('assets/images/Mushroom.png', width: 50),
+              ),
+            ),
+            Positioned(
+              top: 250,
+              right: 40,
+              child: Image.asset('assets/images/Flower.png', width: 40),
+            ),
+            Positioned(
+              bottom: 120,
+              left: 370,
+              child: Transform.rotate(
+                angle: -1.3, // ~15 degrees
+                child: Image.asset('assets/images/Mushroom.png', width: 50),
+              ),
+            ),
+            Positioned(
+              bottom: 190,
+              left: -10,
+              child: Image.asset('assets/images/Flower.png', width: 50),
+            ),
+            Positioned(
+              top: 450,
+              left: 250,
+              child: Image.asset('assets/images/Flower.png', width: 30),
+            ),
+
+            // Main content
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -86,7 +119,6 @@ class HomeScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 60),
-                      // missions preview
                       SizedBox(
                         height: 150,
                         child: StreamBuilder<List<MissionModel>>(
@@ -132,6 +164,8 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
+
+            // Bottom navigation buttons
             Positioned(
               bottom: 30,
               left: 0,
@@ -141,7 +175,6 @@ class HomeScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Missies button (left)
                     ElevatedButton(
                       onPressed: () {
                         Navigator.push(
@@ -161,7 +194,6 @@ class HomeScreen extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                    // Profile button (center)
                     ElevatedButton(
                       onPressed: () {
                         Navigator.push(
@@ -181,7 +213,6 @@ class HomeScreen extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                    // Album button (right)
                     ElevatedButton(
                       onPressed: () {
                         Navigator.push(
