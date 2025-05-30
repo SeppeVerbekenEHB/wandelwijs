@@ -34,28 +34,42 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final MissionService _missionService = MissionService();
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => signOut(context),
-          ),
-        ],
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/Seamlessbackground.png'),
-            fit: BoxFit.cover,
-          ),
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/Seamlessbackground.png'),
+          fit: BoxFit.cover,
         ),
-        child: Stack(
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            child: CircleAvatar(
+              backgroundColor: Colors.green[700],
+              child: IconButton(
+                icon: const Icon(Icons.person, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  );
+                },
+              ),
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () => signOut(context),
+            ),
+          ],
+        ),
+        body: Stack(
           children: [
             // Decorative images
             Positioned(
@@ -95,7 +109,7 @@ class HomeScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Transform.translate(
-                  offset: const Offset(0, -150),
+                  offset: const Offset(0, -80), // Changed from -150 to -80
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -164,84 +178,9 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Bottom navigation buttons
-            Positioned(
-              bottom: 30,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const MissionsScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green[700],
-                        padding: const EdgeInsets.all(16),
-                        shape: const CircleBorder(),
-                        elevation: 5,
-                      ),
-                      child: const Icon(
-                        Icons.flag_rounded,
-                        size: 36,
-                        color: Colors.white,
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green[700],
-                        padding: const EdgeInsets.all(16),
-                        shape: const CircleBorder(),
-                        elevation: 5,
-                      ),
-                      child: const Icon(
-                        Icons.person,
-                        size: 36,
-                        color: Colors.white,
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const AlbumScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green[700],
-                        padding: const EdgeInsets.all(16),
-                        shape: const CircleBorder(),
-                        elevation: 5,
-                      ),
-                      child: const Icon(
-                        Icons.photo_album_rounded,
-                        size: 36,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 200),
-        child: ElevatedButton(
+        floatingActionButton: ElevatedButton(
           onPressed: () {
             Navigator.push(
               context,
@@ -260,8 +199,55 @@ class HomeScreen extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(bottom: 30.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MissionsScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[700],
+                  padding: const EdgeInsets.all(16),
+                  shape: const CircleBorder(),
+                  elevation: 5,
+                ),
+                child: const Icon(
+                  Icons.flag_rounded,
+                  size: 36,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 80),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AlbumScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[700],
+                  padding: const EdgeInsets.all(16),
+                  shape: const CircleBorder(),
+                  elevation: 5,
+                ),
+                child: const Icon(
+                  Icons.photo_album_rounded,
+                  size: 36,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
