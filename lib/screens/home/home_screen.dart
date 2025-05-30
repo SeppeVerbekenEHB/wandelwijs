@@ -188,15 +188,15 @@ class HomeScreen extends StatelessWidget {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[700],
+            backgroundColor: Colors.white,
             padding: const EdgeInsets.all(24),
             shape: const CircleBorder(),
             elevation: 8,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.camera_alt_rounded,
             size: 52,
-            color: Colors.white,
+            color: Colors.green[700],
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -213,15 +213,15 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
+                  backgroundColor: Colors.white,
                   padding: const EdgeInsets.all(16),
                   shape: const CircleBorder(),
                   elevation: 5,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.flag_rounded,
                   size: 36,
-                  color: Colors.white,
+                  color: Colors.green[700],
                 ),
               ),
               const SizedBox(width: 80),
@@ -233,15 +233,15 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
+                  backgroundColor: Colors.white,
                   padding: const EdgeInsets.all(16),
                   shape: const CircleBorder(),
                   elevation: 5,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.photo_album_rounded,
                   size: 36,
-                  color: Colors.white,
+                  color: Colors.green[700],
                 ),
               ),
             ],

@@ -612,15 +612,15 @@ class _AlbumScreenState extends State<AlbumScreen> {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[700],
+            backgroundColor: Colors.white,
             padding: const EdgeInsets.all(24),
             shape: const CircleBorder(),
             elevation: 8,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.home_rounded,
             size: 52,
-            color: Colors.white,
+            color: Colors.green[700],
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -638,25 +638,26 @@ class _AlbumScreenState extends State<AlbumScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
+                  backgroundColor: Colors.white,
                   padding: const EdgeInsets.all(16),
                   shape: const CircleBorder(),
                   elevation: 5,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.flag_rounded,
                   size: 36,
-                  color: Colors.white,
+                  color: Colors.green[700],
                 ),
               ),
               const SizedBox(width: 80),
+              // Album button (right)
               ElevatedButton(
-                onPressed: null,
+                onPressed: () {}, // Changed from null to empty function to prevent greying out
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[400],
+                  backgroundColor: Colors.green[700],
                   padding: const EdgeInsets.all(16),
                   shape: const CircleBorder(),
-                  elevation: 0,
+                  elevation: 5,
                 ),
                 child: const Icon(
                   Icons.photo_album_rounded,

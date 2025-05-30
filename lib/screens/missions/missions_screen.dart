@@ -218,7 +218,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
           ),
         ),
       ),
-    );
+      );
 
     // Show overlay
     Overlay.of(context).insert(overlayEntry);
@@ -407,15 +407,15 @@ class _MissionsScreenState extends State<MissionsScreen> {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[700],
+            backgroundColor: Colors.white,
             padding: const EdgeInsets.all(24),
             shape: const CircleBorder(),
             elevation: 8,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.home_rounded,
             size: 52,
-            color: Colors.white,
+            color: Colors.green[700],
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -424,13 +424,14 @@ class _MissionsScreenState extends State<MissionsScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              // Missions button (left)
               ElevatedButton(
-                onPressed: null,
+                onPressed: () {}, // Changed from null to empty function to prevent greying out
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[400],
+                  backgroundColor: Colors.green[700],
                   padding: const EdgeInsets.all(16),
                   shape: const CircleBorder(),
-                  elevation: 0,
+                  elevation: 5,
                 ),
                 child: const Icon(
                   Icons.flag_rounded,
@@ -448,15 +449,15 @@ class _MissionsScreenState extends State<MissionsScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
+                  backgroundColor: Colors.white,
                   padding: const EdgeInsets.all(16),
                   shape: const CircleBorder(),
                   elevation: 5,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.photo_album_rounded,
                   size: 36,
-                  color: Colors.white,
+                  color: Colors.green[700],
                 ),
               ),
             ],
