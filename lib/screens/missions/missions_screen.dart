@@ -236,17 +236,20 @@ class _MissionsScreenState extends State<MissionsScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Padding(
-          padding: const EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 16.0),
+          padding: const EdgeInsets.fromLTRB(16.0, 60.0, 16.0, 16.0), // Changed top padding from 40 to 60
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
-                'Jouw Missies',
-                style: TextStyle(
-                  fontFamily: 'RetroChild',
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              SizedBox(
+                width: double.infinity,
+                child: Text(
+                  'Missies',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'RetroChild',
+                    fontSize: 46,
+                    color: Colors.green[800],  // Changed from green[700] to green[800]
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
