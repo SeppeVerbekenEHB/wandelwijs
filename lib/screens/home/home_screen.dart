@@ -190,7 +190,8 @@ class HomeScreen extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             padding: const EdgeInsets.all(24),
-            shape: const CircleBorder(),
+            shape: const CircleBorder(
+            ),
             elevation: 8,
           ),
           child: Icon(
@@ -200,51 +201,61 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(bottom: 30.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MissionsScreen()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  padding: const EdgeInsets.all(16),
-                  shape: const CircleBorder(),
-                  elevation: 5,
+        bottomNavigationBar: Container(
+          height: 110,
+          decoration: BoxDecoration(
+            color: Colors.green[700]!.withOpacity(0.7),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(40),
+              topRight: Radius.circular(40),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 30.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MissionsScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.all(16),
+                    shape: const CircleBorder(),
+                    elevation: 5,
+                  ),
+                  child: Icon(
+                    Icons.flag_rounded,
+                    size: 36,
+                    color: Colors.green[700],
+                  ),
                 ),
-                child: Icon(
-                  Icons.flag_rounded,
-                  size: 36,
-                  color: Colors.green[700],
+                const SizedBox(width: 80),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AlbumScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.all(16),
+                    shape: const CircleBorder(),
+                    elevation: 5,
+                  ),
+                  child: Icon(
+                    Icons.photo_album_rounded,
+                    size: 36,
+                    color: Colors.green[700],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 80),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AlbumScreen()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  padding: const EdgeInsets.all(16),
-                  shape: const CircleBorder(),
-                  elevation: 5,
-                ),
-                child: Icon(
-                  Icons.photo_album_rounded,
-                  size: 36,
-                  color: Colors.green[700],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

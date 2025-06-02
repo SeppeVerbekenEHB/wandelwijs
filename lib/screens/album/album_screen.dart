@@ -390,7 +390,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
               )
             : Column(
                 children: [
-                  // Add title text - adjusted padding to account for AppBar
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 60.0, 16.0, 8.0),
                     child: Text(
@@ -655,48 +654,58 @@ class _AlbumScreenState extends State<AlbumScreen> {
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(bottom: 30.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Missions button (left)
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MissionsScreen()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  padding: const EdgeInsets.all(16),
-                  shape: const CircleBorder(),
-                  elevation: 5,
+        bottomNavigationBar: Container(
+          height: 110,
+          decoration: BoxDecoration(
+            color: Colors.green[700]!.withOpacity(0.7),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(40),
+              topRight: Radius.circular(40),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 30.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Missions button (left)
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MissionsScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.all(16),
+                    shape: const CircleBorder(),
+                    elevation: 5,
+                  ),
+                  child: Icon(
+                    Icons.flag_rounded,
+                    size: 36,
+                    color: Colors.green[700],
+                  ),
                 ),
-                child: Icon(
-                  Icons.flag_rounded,
-                  size: 36,
-                  color: Colors.green[700],
+                const SizedBox(width: 80),
+                // Album button (right)
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[700],
+                    padding: const EdgeInsets.all(16),
+                    shape: const CircleBorder(),
+                    elevation: 5,
+                  ),
+                  child: const Icon(
+                    Icons.photo_album_rounded,
+                    size: 36,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 80),
-              // Album button (right)
-              ElevatedButton(
-                onPressed: () {}, // Changed from null to empty function to prevent greying out
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
-                  padding: const EdgeInsets.all(16),
-                  shape: const CircleBorder(),
-                  elevation: 5,
-                ),
-                child: const Icon(
-                  Icons.photo_album_rounded,
-                  size: 36,
-                  color: Colors.white,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

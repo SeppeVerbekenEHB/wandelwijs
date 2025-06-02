@@ -320,7 +320,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                         }
 
                         return ListView.builder(
-                          padding: const EdgeInsets.only(top: 70), // Add this line
+                          padding: const EdgeInsets.only(top: 70),
                           itemCount: missions.length,
                           itemBuilder: (context, index) {
                             final mission = missions[index];
@@ -445,48 +445,58 @@ class _MissionsScreenState extends State<MissionsScreen> {
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(bottom: 30.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Missions button (left)
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[700],
-                  padding: const EdgeInsets.all(16),
-                  shape: const CircleBorder(),
-                  elevation: 5,
+        bottomNavigationBar: Container(
+          height: 110,
+          decoration: BoxDecoration(
+            color: Colors.green[700]!.withOpacity(0.7),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(40),
+              topRight: Radius.circular(40),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 30.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Missions button (left)
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[700],
+                    padding: const EdgeInsets.all(16),
+                    shape: const CircleBorder(),
+                    elevation: 5,
+                  ),
+                  child: const Icon(
+                    Icons.flag_rounded,
+                    size: 36,
+                    color: Colors.white,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.flag_rounded,
-                  size: 36,
-                  color: Colors.white,
+                const SizedBox(width: 80),
+                // Album button (right)
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AlbumScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.all(16),
+                    shape: const CircleBorder(),
+                    elevation: 5,
+                  ),
+                  child: Icon(
+                    Icons.photo_album_rounded,
+                    size: 36,
+                    color: Colors.green[700],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 80),
-              // Album button (right)
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AlbumScreen()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  padding: const EdgeInsets.all(16),
-                  shape: const CircleBorder(),
-                  elevation: 5,
-                ),
-                child: Icon(
-                  Icons.photo_album_rounded,
-                  size: 36,
-                  color: Colors.green[700],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
