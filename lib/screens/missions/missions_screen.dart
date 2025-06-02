@@ -455,7 +455,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 30.0),
+            padding: const EdgeInsets.only(bottom: 20.0, top: 10.0),  // Changed padding
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
