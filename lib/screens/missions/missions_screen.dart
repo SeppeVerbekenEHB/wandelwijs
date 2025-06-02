@@ -47,178 +47,180 @@ class _MissionsScreenState extends State<MissionsScreen> {
     overlayEntry = OverlayEntry(
       builder: (context) => Material(
         color: Colors.black54,
-        child: GestureDetector(
-          onTap: () => overlayEntry.remove(),
-          child: Stack(
-            children: [
-              // Close button at the top
-              Positioned(
-                top: 40,
-                right: 16,
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                  onPressed: () => overlayEntry.remove(),
+        child: Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+              maxWidth: 600,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Mission header
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: mission.completed 
+                          ? Colors.amber 
+                          : Colors.green[700],
+                      child: mission.completed
+                          ? const Icon(Icons.check, color: Colors.white)
+                          : Icon(mission.icon, color: Colors.white),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        mission.title,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'Sniglet',
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              // Mission details content
-              Center(
-                child: GestureDetector(
-                  onTap: () {}, // Prevent taps from closing overlay
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                const SizedBox(height: 16),
+                Text(
+                  mission.description,
+                  style: TextStyle(
+                    fontFamily: 'Sniglet',
+                    color: Colors.grey[700],
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Progress indicator
+                LinearProgressIndicator(
+                  value: mission.progress / mission.total,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    mission.completed ? Colors.amber : Colors.green[700]!,
+                  ),
+                  minHeight: 10,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${mission.progress}/${mission.total}',
+                  style: const TextStyle(
+                    fontFamily: 'Sniglet',
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Discoveries section
+                if (mission.discoveryIds.isNotEmpty) ...[
+                  const Text(
+                    'Ontdekkingen:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'Sniglet',
+                      fontWeight: FontWeight.bold,
                     ),
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.8,
-                      maxWidth: 600,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Mission header
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundColor: mission.completed 
-                                  ? Colors.amber 
-                                  : Colors.green[700],
-                              child: mission.completed
-                                  ? const Icon(Icons.check, color: Colors.white)
-                                  : Icon(mission.icon, color: Colors.white),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(FirebaseAuth.instance.currentUser?.uid)
+                          .collection('discoveries')
+                          .where(FieldPath.documentId, whereIn: mission.discoveryIds)
+                          .snapshots(),
+                      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              'Geen ontdekkingen gevonden',
+                              style: TextStyle(fontFamily: 'Sniglet'),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                mission.title,
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontFamily: 'Sniglet',
+                          );
+                        }
+
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            var discovery = snapshot.data!.docs[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              child: ListTile(
+                                leading: discovery['localImagePath'] != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: Image.file(
+                                          File(discovery['localImagePath']),
+                                          width: 50,
+                                          height: 50,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : const Icon(Icons.image_not_supported),
+                                title: Text(
+                                  discovery['speciesName'] ?? 'Onbekende soort',
+                                  style: const TextStyle(fontFamily: 'Sniglet'),
+                                ),
+                                subtitle: Text(
+                                  discovery['timestamp'] != null
+                                      ? DateTime.fromMillisecondsSinceEpoch(
+                                          discovery['timestamp'].millisecondsSinceEpoch
+                                        ).toString().split('.')[0]
+                                      : 'Onbekende datum',
+                                  style: const TextStyle(fontFamily: 'Sniglet'),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          mission.description,
-                          style: TextStyle(
-                            fontFamily: 'Sniglet',
-                            color: Colors.grey[700],
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // Progress indicator
-                        LinearProgressIndicator(
-                          value: mission.progress / mission.total,
-                          backgroundColor: Colors.grey[300],
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            mission.completed ? Colors.amber : Colors.green[700]!,
-                          ),
-                          minHeight: 10,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${mission.progress}/${mission.total}',
-                          style: const TextStyle(
-                            fontFamily: 'Sniglet',
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        // Discoveries section
-                        if (mission.discoveryIds.isNotEmpty) ...[
-                          const Text(
-                            'Ontdekkingen:',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontFamily: 'Sniglet',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Expanded(
-                            child: StreamBuilder(
-                              stream: FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(FirebaseAuth.instance.currentUser?.uid)
-                                  .collection('discoveries')
-                                  .where(FieldPath.documentId, whereIn: mission.discoveryIds)
-                                  .snapshots(),
-                              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const Center(child: CircularProgressIndicator());
-                                }
-
-                                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                  return const Center(
-                                    child: Text(
-                                      'Geen ontdekkingen gevonden',
-                                      style: TextStyle(fontFamily: 'Sniglet'),
-                                    ),
-                                  );
-                                }
-
-                                return ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: snapshot.data!.docs.length,
-                                  itemBuilder: (context, index) {
-                                    var discovery = snapshot.data!.docs[index];
-                                    return Card(
-                                      margin: const EdgeInsets.symmetric(vertical: 4),
-                                      child: ListTile(
-                                        leading: discovery['localImagePath'] != null
-                                            ? ClipRRect(
-                                                borderRadius: BorderRadius.circular(4),
-                                                child: Image.file(
-                                                  File(discovery['localImagePath']),
-                                                  width: 50,
-                                                  height: 50,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              )
-                                            : const Icon(Icons.image_not_supported),
-                                        title: Text(
-                                          discovery['speciesName'] ?? 'Onbekende soort',
-                                          style: const TextStyle(fontFamily: 'Sniglet'),
-                                        ),
-                                        subtitle: Text(
-                                          discovery['timestamp'] != null
-                                              ? DateTime.fromMillisecondsSinceEpoch(
-                                                  discovery['timestamp'].millisecondsSinceEpoch
-                                                ).toString().split('.')[0]
-                                              : 'Onbekende datum',
-                                          style: const TextStyle(fontFamily: 'Sniglet'),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                        ] else ...[
-                          const Text(
-                            'Nog geen ontdekkingen voor deze missie.',
-                            style: TextStyle(
-                              fontFamily: 'Sniglet',
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ] else ...[
+                  const Text(
+                    'Nog geen ontdekkingen voor deze missie.',
+                    style: TextStyle(
+                      fontFamily: 'Sniglet',
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 20),
+                // Close button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => overlayEntry.remove(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green[700],
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Sluit',
+                      style: TextStyle(
+                        fontFamily: 'Sniglet',
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      
       ),
       );
 
