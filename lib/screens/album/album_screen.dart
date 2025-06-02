@@ -5,6 +5,7 @@ import 'dart:io';
 import '../scan/scan_screen.dart';
 import '../missions/missions_screen.dart';
 import '../home/home_screen.dart';
+import '../profile/profile_screen.dart';
 
 class AlbumScreen extends StatefulWidget {
   const AlbumScreen({super.key});
@@ -350,7 +351,27 @@ class _AlbumScreenState extends State<AlbumScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: _isLoading 
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            child: CircleAvatar(
+              backgroundColor: Colors.green[700],
+              child: IconButton(
+                icon: const Icon(Icons.person, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+        body: _isLoading
           ? Center(
               child: CircularProgressIndicator(
                 color: Colors.green[700],
@@ -367,241 +388,251 @@ class _AlbumScreenState extends State<AlbumScreen> {
                   ),
                 ),
               )
-            : SafeArea(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(_categories.length, (index) {
-                          final isSelected = _currentCategory == index;
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _currentCategory = index;
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: isSelected ? Colors.green[700] : Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                _categories[index]['icon'],
-                                color: isSelected ? Colors.white : Colors.green[700],
-                                size: 32,
-                              ),
-                            ),
-                          );
-                        }),
+            : Column(
+                children: [
+                  // Add title text - adjusted padding to account for AppBar
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 60.0, 16.0, 8.0),
+                    child: Text(
+                      'Album',
+                      style: TextStyle(
+                        fontFamily: 'CherryBombOne',
+                        fontSize: 46,
+                        color: Colors.green[800],
                       ),
                     ),
-                    Expanded(
-                      child: (_categories[_currentCategory]['items'] as List).isEmpty
-                          ? Center(
-                              child: Text(
-                                'Geen ${_categories[_currentCategory]['name'].toString().toLowerCase()} gevonden',
-                                style: TextStyle(
-                                  fontFamily: 'Sniglet',
-                                  fontSize: 18,
-                                  color: Colors.green[700],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(_categories.length, (index) {
+                        final isSelected = _currentCategory == index;
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _currentCategory = index;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isSelected ? Colors.green[700] : Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
                                 ),
+                              ],
+                            ),
+                            child: Icon(
+                              _categories[index]['icon'],
+                              color: isSelected ? Colors.white : Colors.green[700],
+                              size: 32,
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                  Expanded(
+                    child: (_categories[_currentCategory]['items'] as List).isEmpty
+                        ? Center(
+                            child: Text(
+                              'Geen ${_categories[_currentCategory]['name'].toString().toLowerCase()} gevonden',
+                              style: TextStyle(
+                                fontFamily: 'Sniglet',
+                                fontSize: 18,
+                                color: Colors.green[700],
                               ),
-                            )
-                          : GridView.builder(
-                              padding: const EdgeInsets.all(16.0),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                              ),
-                              itemCount: (_categories[_currentCategory]['items'] as List).length,
-                              itemBuilder: (context, index) {
-                                final item = _categories[_currentCategory]['items'][index];
-                                return Card(
-                                  elevation: 4,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      item['discovered']
-                                          ? GestureDetector(
-                                              onTap: () => _showSpeciesDetails(
-                                                item, 
-                                                _categories[_currentCategory]['icon'],
+                            ),
+                          )
+                        : GridView.builder(
+                            padding: const EdgeInsets.all(16.0),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                            ),
+                            itemCount: (_categories[_currentCategory]['items'] as List).length,
+                            itemBuilder: (context, index) {
+                              final item = _categories[_currentCategory]['items'][index];
+                              return Card(
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    item['discovered']
+                                        ? GestureDetector(
+                                            onTap: () => _showSpeciesDetails(
+                                              item, 
+                                              _categories[_currentCategory]['icon'],
+                                            ),
+                                            child: (item['discoveredImagePath'] != null
+                                                ? Image.file(
+                                                    File(item['discoveredImagePath']),
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context, error, stackTrace) {
+                                                      // Fallback to database image or icon
+                                                      return item['image'] != null 
+                                                        ? Image.network(
+                                                            item['image'],
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (context, error, stackTrace) {
+                                                              return Container(
+                                                                color: Colors.green[100],
+                                                                child: Icon(
+                                                                  _categories[_currentCategory]['icon'],
+                                                                  size: 50,
+                                                                  color: Colors.green[700],
+                                                                ),
+                                                              );
+                                                            },
+                                                            loadingBuilder: (context, child, loadingProgress) {
+                                                              if (loadingProgress == null) return child;
+                                                              return Center(
+                                                                child: CircularProgressIndicator(
+                                                                  color: Colors.green[700],
+                                                                  value: loadingProgress.expectedTotalBytes != null
+                                                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                                      : null,
+                                                                ),
+                                                              );
+                                                            },
+                                                          )
+                                                        : Container(
+                                                            color: Colors.green[100],
+                                                            child: Icon(
+                                                              _categories[_currentCategory]['icon'],
+                                                              size: 50,
+                                                              color: Colors.green[700],
+                                                            ),
+                                                          );
+                                                    },
+                                                  )
+                                                : item['image'] != null
+                                                    ? Image.network(
+                                                        item['image'],
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context, error, stackTrace) {
+                                                          return Container(
+                                                            color: Colors.green[100],
+                                                            child: Icon(
+                                                              _categories[_currentCategory]['icon'],
+                                                              size: 50,
+                                                              color: Colors.green[700],
+                                                            ),
+                                                          );
+                                                        },
+                                                        loadingBuilder: (context, child, loadingProgress) {
+                                                          if (loadingProgress == null) return child;
+                                                          return Center(
+                                                            child: CircularProgressIndicator(
+                                                              color: Colors.green[700],
+                                                              value: loadingProgress.expectedTotalBytes != null
+                                                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                                  : null,
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : Container(
+                                                        color: Colors.green[100],
+                                                        child: Icon(
+                                                          _categories[_currentCategory]['icon'],
+                                                          size: 50,
+                                                          color: Colors.green[700],
+                                                        ),
+                                                      ))
+                                        )
+                                        : Container(
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                                colors: [Colors.grey[200]!, Colors.grey[400]!],
                                               ),
-                                              child: (item['discoveredImagePath'] != null
-                                                  ? Image.file(
-                                                      File(item['discoveredImagePath']),
-                                                      fit: BoxFit.cover,
-                                                      errorBuilder: (context, error, stackTrace) {
-                                                        // Fallback to database image or icon
-                                                        return item['image'] != null 
-                                                          ? Image.network(
-                                                              item['image'],
-                                                              fit: BoxFit.cover,
-                                                              errorBuilder: (context, error, stackTrace) {
-                                                                return Container(
-                                                                  color: Colors.green[100],
-                                                                  child: Icon(
-                                                                    _categories[_currentCategory]['icon'],
-                                                                    size: 50,
-                                                                    color: Colors.green[700],
-                                                                  ),
-                                                                );
-                                                              },
-                                                              loadingBuilder: (context, child, loadingProgress) {
-                                                                if (loadingProgress == null) return child;
-                                                                return Center(
-                                                                  child: CircularProgressIndicator(
-                                                                    color: Colors.green[700],
-                                                                    value: loadingProgress.expectedTotalBytes != null
-                                                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                                                        : null,
-                                                                  ),
-                                                                );
-                                                              },
-                                                            )
-                                                          : Container(
-                                                              color: Colors.green[100],
-                                                              child: Icon(
-                                                                _categories[_currentCategory]['icon'],
-                                                                size: 50,
-                                                                color: Colors.green[700],
-                                                              ),
-                                                            );
-                                                      },
-                                                    )
-                                                  : item['image'] != null
-                                                      ? Image.network(
-                                                          item['image'],
-                                                          fit: BoxFit.cover,
-                                                          errorBuilder: (context, error, stackTrace) {
-                                                            return Container(
-                                                              color: Colors.green[100],
-                                                              child: Icon(
-                                                                _categories[_currentCategory]['icon'],
-                                                                size: 50,
-                                                                color: Colors.green[700],
-                                                              ),
-                                                            );
-                                                          },
-                                                          loadingBuilder: (context, child, loadingProgress) {
-                                                            if (loadingProgress == null) return child;
-                                                            return Center(
-                                                              child: CircularProgressIndicator(
-                                                                color: Colors.green[700],
-                                                                value: loadingProgress.expectedTotalBytes != null
-                                                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                                                    : null,
-                                                              ),
-                                                            );
-                                                          },
-                                                        )
-                                                      : Container(
-                                                          color: Colors.green[100],
-                                                          child: Icon(
-                                                            _categories[_currentCategory]['icon'],
-                                                            size: 50,
-                                                            color: Colors.green[700],
-                                                          ),
-                                                        ))
-                                            )
-                                          : Container(
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  begin: Alignment.topCenter,
-                                                  end: Alignment.bottomCenter,
-                                                  colors: [Colors.grey[200]!, Colors.grey[400]!],
+                                            ),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Icon(
+                                                  _categories[_currentCategory]['icon'],
+                                                  size: 80,
+                                                  color: Colors.grey[600]!.withOpacity(0.4),
                                                 ),
-                                              ),
-                                              child: Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  Icon(
-                                                    _categories[_currentCategory]['icon'],
-                                                    size: 80,
-                                                    color: Colors.grey[600]!.withOpacity(0.4),
-                                                  ),
-                                                  // Small lock icon in the corner
-                                                  Positioned(
-                                                    top: 8,
-                                                    right: 8,
-                                                    child: Container(
-                                                      padding: const EdgeInsets.all(4),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.grey[600]!.withOpacity(0.7),
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      child: const Icon(
-                                                        Icons.lock,
-                                                        color: Colors.white,
-                                                        size: 14,
-                                                      ),
+                                                // Small lock icon in the corner
+                                                Positioned(
+                                                  top: 8,
+                                                  right: 8,
+                                                  child: Container(
+                                                    padding: const EdgeInsets.all(4),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[600]!.withOpacity(0.7),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.lock,
+                                                      color: Colors.white,
+                                                      size: 14,
                                                     ),
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
+                                          ),
+                                    Positioned(
+                                      bottom: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        color: Colors.black54,
+                                        child: Text(
+                                          item['discovered'] 
+                                            ? item['name'] 
+                                            : _currentCategory == 1 
+                                                ? "Onbekend ${_getCategoryInDutch(_currentCategory)}" 
+                                                : "Onbekende ${_getCategoryInDutch(_currentCategory)}",
+                                          style: const TextStyle(
+                                            fontFamily: 'Sniglet',
+                                            color: Colors.white,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                    if (item['discovered'])
                                       Positioned(
-                                        bottom: 0,
-                                        left: 0,
-                                        right: 0,
+                                        top: 8,
+                                        right: 8,
                                         child: Container(
-                                          padding: const EdgeInsets.all(8.0),
-                                          color: Colors.black54,
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green[700],
+                                            shape: BoxShape.circle,
+                                          ),
                                           child: Text(
-                                            item['discovered'] 
-                                              ? item['name'] 
-                                              : _currentCategory == 1 
-                                                  ? "Onbekend ${_getCategoryInDutch(_currentCategory)}" 
-                                                  : "Onbekende ${_getCategoryInDutch(_currentCategory)}",
+                                            "${item['points']}pt",
                                             style: const TextStyle(
-                                              fontFamily: 'Sniglet',
                                               color: Colors.white,
+                                              fontSize: 10,
                                             ),
-                                            textAlign: TextAlign.center,
                                           ),
                                         ),
                                       ),
-                                      if (item['discovered'])
-                                        Positioned(
-                                          top: 8,
-                                          right: 8,
-                                          child: Container(
-                                            padding: const EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              color: Colors.green[700],
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: Text(
-                                              "${item['points']}pt",
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 10,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                    ),
-                  ],
-                ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
         floatingActionButton: ElevatedButton(
           onPressed: () {

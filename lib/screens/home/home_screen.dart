@@ -52,7 +52,7 @@ class HomeScreen extends StatelessWidget {
             child: CircleAvatar(
               backgroundColor: Colors.green[700],
               child: IconButton(
-                icon: const Icon(Icons.person, color: Colors.white),
+                icon: const Icon(Icons.person, color: Colors.white ),
                 onPressed: () {
                   Navigator.push(
                     context,

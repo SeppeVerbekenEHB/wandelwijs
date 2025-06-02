@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../home/home_screen.dart';
+import '../profile/profile_screen.dart';
 
 class MissionsScreen extends StatefulWidget {
   const MissionsScreen({super.key});
@@ -217,6 +218,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
             ],
           ),
         ),
+      
       ),
       );
 
@@ -235,6 +237,26 @@ class _MissionsScreenState extends State<MissionsScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            child: CircleAvatar(
+              backgroundColor: Colors.green[700],
+              child: IconButton(
+                icon: const Icon(Icons.person, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
         body: Padding(
           padding: const EdgeInsets.fromLTRB(16.0, 60.0, 16.0, 16.0),
           child: Column(
@@ -246,13 +268,13 @@ class _MissionsScreenState extends State<MissionsScreen> {
                   'Missies',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'RetroChild',
+                    fontFamily: 'CherryBombOne',
                     fontSize: 46,
                     color: Colors.green[800],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 0),
               Expanded(
                 child: _isLoading 
                   ? Center(
@@ -298,6 +320,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                         }
 
                         return ListView.builder(
+                          padding: const EdgeInsets.only(top: 70), // Add this line
                           itemCount: missions.length,
                           itemBuilder: (context, index) {
                             final mission = missions[index];
