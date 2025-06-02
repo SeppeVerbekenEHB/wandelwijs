@@ -169,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text(
                           'Wandelwijs',
                           style: TextStyle(
-                            fontFamily: 'RetroChild',
+                            fontFamily: 'CherryBombOne',
                             fontSize: 48,
                             color: Colors.green[800],
                           ),

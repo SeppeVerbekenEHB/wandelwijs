@@ -80,3 +80,6 @@ flutter:
         - asset: assets/fonts/Sniglet-Regular.ttf
         - asset: assets/fonts/Sniglet-ExtraBold.ttf
           weight: 800
+    - family: CherryBombOne
+      fonts:
+        - asset: assets/fonts/CherryBombOne-Regular.ttf

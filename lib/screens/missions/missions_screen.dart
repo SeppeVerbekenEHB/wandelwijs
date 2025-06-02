@@ -236,7 +236,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Padding(
-          padding: const EdgeInsets.fromLTRB(16.0, 60.0, 16.0, 16.0), // Changed top padding from 40 to 60
+          padding: const EdgeInsets.fromLTRB(16.0, 60.0, 16.0, 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -248,7 +248,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                   style: TextStyle(
                     fontFamily: 'RetroChild',
                     fontSize: 46,
-                    color: Colors.green[800],  // Changed from green[700] to green[800]
+                    color: Colors.green[800],
                   ),
                 ),
               ),
@@ -429,7 +429,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
             children: [
               // Missions button (left)
               ElevatedButton(
-                onPressed: () {}, // Changed from null to empty function to prevent greying out
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green[700],
                   padding: const EdgeInsets.all(16),

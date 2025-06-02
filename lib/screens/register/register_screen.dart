@@ -185,7 +185,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Text(
                           'Registreren',
                           style: TextStyle(
-                            fontFamily: 'RetroChild',
+                            fontFamily: 'CherryBombOne',
                             fontSize: 40,
                             color: Colors.green[800],
                           ),

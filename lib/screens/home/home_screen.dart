@@ -117,7 +117,7 @@ class HomeScreen extends StatelessWidget {
                       Text(
                         'Wandelwijs',
                         style: TextStyle(
-                          fontFamily: 'RetroChild',
+                          fontFamily: 'CherryBombOne',
                           fontSize: 60,
                           color: Colors.green[800],
                         ),
