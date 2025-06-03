@@ -17,6 +17,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int _discoveryCount = 0;
   int _completedMissionsCount = 0;
   String _selectedProfilePicture = 'assets/images/Cat_Profile.png';
+  int _totalPoints = 0;
+  final Map<String, int> _profilePicturePoints = {
+    'assets/images/Cat_Profile.png': 0,
+    'assets/images/Dino_Profile.png': 100,
+    'assets/images/Flower_Profile.png': 500,
+    'assets/images/Robot_Profile.png': 1000,
+  };
 
   @override
   void initState() {
@@ -24,6 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadDiscoveryCount();
     _loadCompletedMissionsCount();
     _loadProfilePicture();
+    _loadTotalPoints();
   }
 
   Future<void> _loadDiscoveryCount() async {
@@ -90,23 +98,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _loadTotalPoints() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      
+      setState(() {
+        _totalPoints = userData.data()?['totalPoints'] ?? 0;
+      });
+    }
+  }
+
   void _showProfilePictureDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Kies een profielfoto', 
-            style: TextStyle(fontFamily: 'Sniglet'),
+          title: Column(
+            children: [
+              const Text('Kies een profielfoto', 
+                style: TextStyle(fontFamily: 'Sniglet'),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Je hebt $_totalPoints punten',
+                style: const TextStyle(
+                  fontFamily: 'Sniglet',
+                  fontSize: 14,
+                  color: Colors.green,
+                ),
+              ),
+            ],
           ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildProfilePictureOption('assets/images/Cat_Profile.png', 'Kat'),
-                _buildProfilePictureOption('assets/images/Dino_Profile.png', 'Dino'),
-                _buildProfilePictureOption('assets/images/Flower_Profile.png', 'Bloem'),
-                _buildProfilePictureOption('assets/images/Robot_Profile.png', 'Robot'),
-              ],
+              children: _profilePicturePoints.entries.map((entry) {
+                bool isLocked = entry.value > _totalPoints;
+                return _buildProfilePictureOption(
+                  entry.key,
+                  _getProfileName(entry.key),
+                  isLocked,
+                  entry.value,
+                );
+              }).toList(),
             ),
           ),
         );
@@ -114,13 +152,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfilePictureOption(String imagePath, String name) {
+  String _getProfileName(String path) {
+    switch (path) {
+      case 'assets/images/Cat_Profile.png':
+        return 'Kat';
+      case 'assets/images/Dino_Profile.png':
+        return 'Dino (100 punten)';
+      case 'assets/images/Flower_Profile.png':
+        return 'Bloem (500 punten)';
+      case 'assets/images/Robot_Profile.png':
+        return 'Robot (1000 punten)';
+      default:
+        return '';
+    }
+  }
+
+  Widget _buildProfilePictureOption(String imagePath, String name, bool isLocked, int points) {
     return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: AssetImage(imagePath),
+      leading: Stack(
+        children: [
+          SizedBox(
+            width: 50,
+            height: 50,
+            child: ColorFiltered(
+              colorFilter: ColorFilter.matrix(isLocked ? [
+                0.2126, 0.7152, 0.0722, 0, 0,
+                0.2126, 0.7152, 0.0722, 0, 0,
+                0.2126, 0.7152, 0.0722, 0, 0,
+                0, 0, 0, 1, 0,
+              ] : [
+                1, 0, 0, 0, 0,
+                0, 1, 0, 0, 0,
+                0, 0, 1, 0, 0,
+                0, 0, 0, 1, 0,
+              ]),
+              child: Image.asset(imagePath),
+            ),
+          ),
+          if (isLocked)
+            const Positioned(
+              right: 0,
+              bottom: 0,
+              child: Icon(Icons.lock, color: Colors.grey, size: 20),
+            ),
+        ],
       ),
-      title: Text(name, style: const TextStyle(fontFamily: 'Sniglet')),
-      onTap: () {
+      title: Text(
+        name,
+        style: TextStyle(
+          fontFamily: 'Sniglet',
+          color: isLocked ? Colors.grey : Colors.black,
+        ),
+      ),
+      onTap: isLocked ? null : () {
         _updateProfilePicture(imagePath);
         Navigator.pop(context);
       },
@@ -166,10 +250,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     GestureDetector(
                       onTap: _showProfilePictureDialog,
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundImage: AssetImage(_selectedProfilePicture),
-                        backgroundColor: Colors.green,
+                      child: Stack(
+                        children: [
+                          SizedBox(
+                            width: 100,
+                            height: 100,
+                            child: Image.asset(_selectedProfilePicture),
+                          ),
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.green,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 10),
