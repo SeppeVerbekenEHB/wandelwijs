@@ -27,6 +27,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
   int _pointsValue = 0;
   String _description = "";
   bool _isNewDiscovery = true; // New state variable to track if this is a new discovery
+  bool _isExpanded = false; // Add this line
   final MissionService _missionService = MissionService();
 
   @override
@@ -338,13 +339,6 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Ontdekking Verifiëren',
-          style: TextStyle(fontFamily: 'Sniglet'),
-        ),
-        backgroundColor: Colors.green[700],
-      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -356,7 +350,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 0), // Adjusted top padding
             child: _isLoading
               ? Center(
                   child: Column(
@@ -410,7 +404,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                           "Proficiat!",
                           style: TextStyle(
                             fontSize: 40,
-                            fontWeight: FontWeight.bold,
+                            fontFamily: 'CherryBombOne',
                             color: Colors.green[800],
                           ),
                         ),
@@ -430,7 +424,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                           style: TextStyle(
                             fontSize: 22,
                             fontFamily: 'Sniglet',
-                            color: Color(0xFF4785D2), // Changed to the requested color #4785D2
+                            color: Color(0xFF4785D2),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -547,14 +541,46 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                       const SizedBox(height: 10),
                       
                       // Left-align the description text (removed the Align wrapper)
-                      Text(
-                        _description,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontFamily: 'Sniglet',
-                          color: Colors.grey[800],
-                        ),
-                        // Removed textAlign: TextAlign.center
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: _isExpanded ? double.infinity : 80,
+                            ),
+                            child: SingleChildScrollView(
+                              physics: _isExpanded 
+                                ? const AlwaysScrollableScrollPhysics() 
+                                : const NeverScrollableScrollPhysics(),
+                              child: Text(
+                                _description,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontFamily: 'Sniglet',
+                                  color: Colors.grey[800],
+                                ),
+                                maxLines: _isExpanded ? null : 4,
+                                overflow: _isExpanded ? TextOverflow.visible : TextOverflow.fade,
+                              ),
+                            ),
+                          ),
+                          if (_description.length > 100) // Only show if text is long
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isExpanded = !_isExpanded;
+                                });
+                              },
+                              child: Text(
+                                _isExpanded ? 'Minder' : 'Meer',
+                                style: TextStyle(
+                                  color: Colors.green[700],
+                                  fontFamily: 'Sniglet',
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                       
                       const SizedBox(height: 10),
