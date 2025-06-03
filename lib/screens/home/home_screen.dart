@@ -73,7 +73,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             // Decorative images
             Positioned(
-              top: 80,
+              top: 125,
               left: -8,
               child: Transform.rotate(
                 angle: 0.42, // ~15 degrees
@@ -82,7 +82,7 @@ class HomeScreen extends StatelessWidget {
             ),
             Positioned(
               top: 250,
-              right: 40,
+              right: 30,
               child: Image.asset('assets/images/Flower.png', width: 40),
             ),
             Positioned(
@@ -109,7 +109,7 @@ class HomeScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Transform.translate(
-                  offset: const Offset(0, -80), // Changed from -150 to -80
+                  offset: const Offset(0, -80),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
