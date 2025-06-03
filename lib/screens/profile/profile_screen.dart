@@ -15,11 +15,13 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   int _discoveryCount = 0;
+  int _completedMissionsCount = 0;
 
   @override
   void initState() {
     super.initState();
     _loadDiscoveryCount();
+    _loadCompletedMissionsCount();
   }
 
   Future<void> _loadDiscoveryCount() async {
@@ -38,6 +40,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       setState(() {
         _discoveryCount = uniqueSpecies.length;
+      });
+    }
+  }
+
+  Future<void> _loadCompletedMissionsCount() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final missions = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('missions')
+          .where('completed', isEqualTo: true)
+          .get();
+
+      setState(() {
+        _completedMissionsCount = missions.docs.length;
       });
     }
   }
@@ -100,15 +118,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    const ListTile(
-                      leading: Icon(Icons.hiking, color: Colors.green),
-                      title: Text('Stappen', style: TextStyle(fontFamily: 'Sniglet')),
-                      trailing: Text('0', style: TextStyle(fontFamily: 'Sniglet')),
-                    ),
-                    const ListTile(
-                      leading: Icon(Icons.emoji_events, color: Colors.green),
-                      title: Text('Voltooide Missies', style: TextStyle(fontFamily: 'Sniglet')),
-                      trailing: Text('0', style: TextStyle(fontFamily: 'Sniglet')),
+                    ListTile(
+                      leading: const Icon(Icons.emoji_events, color: Colors.green),
+                      title: const Text('Voltooide Missies', style: TextStyle(fontFamily: 'Sniglet')),
+                      trailing: Text(
+                        '$_completedMissionsCount',
+                        style: const TextStyle(fontFamily: 'Sniglet')
+                      ),
                     ),
                     ListTile(
                       leading: const Icon(Icons.photo_album, color: Colors.green),
