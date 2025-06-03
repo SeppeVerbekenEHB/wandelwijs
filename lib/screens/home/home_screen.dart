@@ -87,21 +87,28 @@ class HomeScreen extends StatelessWidget {
             ),
             Positioned(
               bottom: 120,
-              left: 370,
+              left: 340,
               child: Transform.rotate(
-                angle: -1.3, // ~15 degrees
-                child: Image.asset('assets/images/Mushroom.png', width: 50),
+                angle: -1.3,
+                child: SizedBox(
+                  width: 90,
+                  height: 90,
+                  child: Image.asset(
+                    'assets/images/Mushroom.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
             ),
             Positioned(
-              bottom: 190,
-              left: -10,
-              child: Image.asset('assets/images/Flower.png', width: 50),
+              bottom: 150,
+              left: 0,
+              child: Image.asset('assets/images/Flower.png', width: 100),
             ),
             Positioned(
-              top: 450,
-              left: 250,
-              child: Image.asset('assets/images/Flower.png', width: 30),
+              top: 500,
+              left: 100,
+              child: Image.asset('assets/images/Bee.png', width: 80),
             ),
 
             // Main content

@@ -69,6 +69,7 @@ flutter:
     - assets/images/
     - assets/images/Mushroom.png
     - assets/images/Flower.png
+    - assets/images/Bee.png
     - .env
 
   fonts:
