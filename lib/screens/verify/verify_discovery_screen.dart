@@ -26,8 +26,8 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
   bool _isSaving = false;
   int _pointsValue = 0;
   String _description = "";
-  bool _isNewDiscovery = true; // New state variable to track if this is a new discovery
-  bool _isExpanded = false; // Add this line
+  bool _isNewDiscovery = true;
+  bool _isExpanded = false;
   final MissionService _missionService = MissionService();
 
   @override
@@ -90,7 +90,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
         });
       } else {
         // Species not found in database - use default values
-        // Still check if user already discovered it
+        // check if user already discovered it
         int adjustedPoints = alreadyDiscovered ? 1 : 5; // 1/4 of default 5 = ~1
         
         setState(() {
@@ -107,7 +107,6 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
         _isLoading = false;
         _pointsValue = 5;
         _description = "Er is een fout opgetreden bij het ophalen van informatie over ${widget.speciesName}.";
-        // Assuming it's new if we can't check
         _isNewDiscovery = true;
       });
     }
@@ -199,7 +198,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                 ? 'Nieuwe ontdekking succesvol opgeslagen!'
                 : 'Je hebt ${_pointsValue} punten ontvangen!',
               style: const TextStyle(
-                fontFamily: 'Sniglet', // Changed font to Sniglet
+                fontFamily: 'Sniglet',
               ),
             ),
             backgroundColor: Colors.green[700],
@@ -228,7 +227,6 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
     }
   }
 
-  // Add this new function to show mission progress
   Future<void> _showMissionProgressDialog(String category) async {
     // Get missions that match the category
     final missions = await FirebaseFirestore.instance
@@ -246,7 +244,6 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
 
     if (!mounted || missions.docs.isEmpty) return;
 
-    // Show overlay
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Material(
         color: Colors.black54,
@@ -350,7 +347,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 0), // Adjusted top padding
+            padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 0),
             child: _isLoading
               ? Center(
                   child: Column(
@@ -395,9 +392,8 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                   )
                 : SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Add this to align all child widgets to the left
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Add congratulatory text at the top with larger font
                       Align(
                         alignment: Alignment.center,
                         child: Text(
@@ -410,7 +406,6 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Dynamic message - keep centered
                       Align(
                         alignment: Alignment.center,
                         child: Text(
@@ -464,12 +459,11 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Points row with better alignment
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     const SizedBox(
-                                      width: 40, // Fixed width container for icon
+                                      width: 40,
                                       child: Icon(
                                         Icons.star,
                                         color: Colors.amber,
@@ -488,20 +482,19 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                                 
                                 const SizedBox(height: 12),
                                 
-                                // Discovery count row with matching alignment
                                 if (_isNewDiscovery)
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
-                                        width: 40, // Same fixed width as above
+                                        width: 40,
                                         child: Icon(
                                           widget.category.toLowerCase().contains("dier") || 
                                           widget.category.toLowerCase().contains("vogel") || 
                                           widget.category.toLowerCase().contains("insect") ? 
                                             Icons.pets : Icons.eco,
                                           color: Color(0xFF4785D2),
-                                          size: 32, // Slightly adjusted
+                                          size: 32,
                                         ),
                                       ),
                                       Text(
@@ -533,14 +526,12 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                         style: TextStyle(
                           fontSize: 32,
                           fontFamily: 'Sniglet',
-                          color: Color(0xFF4785D2), // Changed to the requested color #4785D2
+                          color: Color(0xFF4785D2),
                         ),
-                        // No need for textAlign when parent column is left-aligned
                       ),
                       
                       const SizedBox(height: 10),
                       
-                      // Left-align the description text (removed the Align wrapper)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -585,14 +576,13 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                       
                       const SizedBox(height: 10),
                       
-                      // Center the button
                       Align(
                         alignment: Alignment.center,
                         child: ElevatedButton(
-                          onPressed: _saveDiscovery, // Changed from navigation to saving function
+                          onPressed: _saveDiscovery,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green[600],
-                            padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 18), // Increased padding
+                            padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 18),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -601,7 +591,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                             'Ontdekking Opslaan',
                             style: TextStyle(
                               fontFamily: 'Sniglet',
-                              fontSize: 22, // Increased from 18
+                              fontSize: 22,
                               color: Colors.white,
                             ),
                           ),
