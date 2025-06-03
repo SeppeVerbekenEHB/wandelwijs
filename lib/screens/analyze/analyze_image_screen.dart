@@ -102,12 +102,15 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
             if (parts.length >= 2) {
               speciesName = parts[0].trim();
               speciesType = parts[1].trim();
+              print('Parsed species: $speciesName, type: $speciesType');
             } else {
               speciesName = lines[0].trim();
+              print('Only species name found: $speciesName');
             }
           }
         }
         
+        print('Setting state with: speciesName=$speciesName, type=$speciesType');
         setState(() {
           _isLoading = false;
           _result = content;
@@ -115,17 +118,19 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
           _speciesType = speciesType;
         });
       } else {
+        print('Error response from API');
         setState(() {
           _isLoading = false;
           _result = "Error: ${response.statusCode} - ${response.body}";
         });
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('Error in _analyzeImage: $e');
+      print('Stack trace: $stackTrace');
       setState(() {
         _isLoading = false;
         _result = "An error occurred: $e";
       });
-      print("Error details: $e");
     }
   }
   

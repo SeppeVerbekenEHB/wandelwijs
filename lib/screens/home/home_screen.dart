@@ -6,6 +6,8 @@ import '../../screens/profile/profile_screen.dart';
 import '../../screens/missions/missions_screen.dart';
 import '../../screens/album/album_screen.dart';
 import '../../screens/scan/scan_screen.dart';
+import '../../services/mission_service.dart';
+import '../../models/mission_model.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,7 +19,6 @@ class HomeScreen extends StatelessWidget {
   Future<void> signOut(BuildContext context) async {
     try {
       await Auth().signOut();
-      // Navigate to login page after successful sign out
       Navigator.pushReplacementNamed(context, AppRoutes.login);
     } catch (e) {
       print('Error signing out: $e');
@@ -31,34 +32,91 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => signOut(context),
-          ),
-        ],
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/Seamlessbackground.png'),
-            fit: BoxFit.cover,
-          ),
+    final MissionService _missionService = MissionService();
+
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/Seamlessbackground.png'),
+          fit: BoxFit.cover,
         ),
-        child: Stack(
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            child: CircleAvatar(
+              backgroundColor: Colors.green[700],
+              child: IconButton(
+                icon: const Icon(Icons.person, color: Colors.white ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  );
+                },
+              ),
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () => signOut(context),
+            ),
+          ],
+        ),
+        body: Stack(
           children: [
+            // Decorative images
+            Positioned(
+              top: 125,
+              left: -8,
+              child: Transform.rotate(
+                angle: 0.42, // ~15 degrees
+                child: Image.asset('assets/images/Mushroom.png', width: 50),
+              ),
+            ),
+            Positioned(
+              top: 250,
+              right: 30,
+              child: Image.asset('assets/images/Flower.png', width: 40),
+            ),
+            Positioned(
+              bottom: 120,
+              left: 340,
+              child: Transform.rotate(
+                angle: -1.3,
+                child: SizedBox(
+                  width: 90,
+                  height: 90,
+                  child: Image.asset(
+                    'assets/images/Mushroom.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 150,
+              left: 0,
+              child: Image.asset('assets/images/Flower.png', width: 100),
+            ),
+            Positioned(
+              top: 500,
+              left: 100,
+              child: Image.asset('assets/images/Bee.png', width: 80),
+            ),
+
+            // Main content
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Transform.translate(
-                  offset: const Offset(0, -150),
+                  offset: const Offset(0, -80),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -66,118 +124,70 @@ class HomeScreen extends StatelessWidget {
                       Text(
                         'Wandelwijs',
                         style: TextStyle(
-                          fontFamily: 'RetroChild',
+                          fontFamily: 'CherryBombOne',
                           fontSize: 60,
-                          fontWeight: FontWeight.bold,
                           color: Colors.green[800],
                         ),
                       ),
-                      const SizedBox(height: 0),
+                      const SizedBox(height: 10),
                       const Text(
                         'Wandelen wordt een avontuur',
                         style: TextStyle(
                           fontFamily: 'Sniglet',
                           fontSize: 18,
-                          fontWeight: FontWeight.normal,  // Changed to normal weight
+                          fontWeight: FontWeight.normal,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // profile button at the top center
-            Positioned(
-              top: 80,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.green[700],
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
+                      const SizedBox(height: 60),
+                      SizedBox(
+                        height: 150,
+                        child: StreamBuilder<List<MissionModel>>(
+                          stream: _missionService.getMissions(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+
+                            final missions = snapshot.data!;
+                            final incompleteMissions = missions
+                                .where((m) => !m.completed)
+                                .take(2)
+                                .toList();
+
+                            return Column(
+                              children: incompleteMissions.map((mission) => Card(
+                                margin: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 16,
+                                ),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: Colors.green[700],
+                                    child: Icon(mission.icon, color: Colors.white),
+                                  ),
+                                  title: Text(
+                                    mission.title,
+                                    style: const TextStyle(fontFamily: 'Sniglet'),
+                                  ),
+                                  trailing: Text(
+                                    '${mission.progress}/${mission.total}',
+                                    style: const TextStyle(fontFamily: 'Sniglet'),
+                                  ),
+                                ),
+                              )).toList(),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                      );
-                    },
-                    icon: const Icon(Icons.person, color: Colors.white, size: 28),
-                    padding: const EdgeInsets.all(12),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 30,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Missies button (left)
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const MissionsScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green[700],
-                        padding: const EdgeInsets.all(16),
-                        shape: const CircleBorder(),
-                        elevation: 5,
-                      ),
-                      child: const Icon(
-                        Icons.flag_rounded,
-                        size: 36,
-                        color: Colors.white,
-                      ),
-                    ),
-                    // Album button (right)
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const AlbumScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green[700],
-                        padding: const EdgeInsets.all(16),
-                        shape: const CircleBorder(),
-                        elevation: 5,
-                      ),
-                      child: const Icon(
-                        Icons.photo_album_rounded,
-                        size: 36,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 200),
-        child: ElevatedButton(
+        floatingActionButton: ElevatedButton(
           onPressed: () {
             Navigator.push(
               context,
@@ -185,19 +195,77 @@ class HomeScreen extends StatelessWidget {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[700],
-            padding: const EdgeInsets.all(20),
-            shape: const CircleBorder(),
+            backgroundColor: Colors.white,
+            padding: const EdgeInsets.all(24),
+            shape: const CircleBorder(
+            ),
             elevation: 8,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.camera_alt_rounded,
-            size: 45,
-            color: Colors.white,
+            size: 52,
+            color: Colors.green[700],
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: Container(
+          height: 110,
+          decoration: BoxDecoration(
+            color: Colors.green[700]!.withOpacity(0.7),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(40),
+              topRight: Radius.circular(40),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20.0, top: 10.0),  // Changed padding
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MissionsScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.all(16),
+                    shape: const CircleBorder(),
+                    elevation: 5,
+                  ),
+                  child: Icon(
+                    Icons.flag_rounded,
+                    size: 36,
+                    color: Colors.green[700],
+                  ),
+                ),
+                const SizedBox(width: 80),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AlbumScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.all(16),
+                    shape: const CircleBorder(),
+                    elevation: 5,
+                  ),
+                  child: Icon(
+                    Icons.photo_album_rounded,
+                    size: 36,
+                    color: Colors.green[700],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

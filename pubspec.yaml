@@ -67,6 +67,13 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/Mushroom.png
+    - assets/images/Flower.png
+    - assets/images/Bee.png
+    - assets/images/Cat_Profile.png
+    - assets/images/Dino_Profile.png
+    - assets/images/Flower_Profile.png
+    - assets/images/Robot_Profile.png
     - .env
 
   fonts:
@@ -78,3 +85,6 @@ flutter:
         - asset: assets/fonts/Sniglet-Regular.ttf
         - asset: assets/fonts/Sniglet-ExtraBold.ttf
           weight: 800
+    - family: CherryBombOne
+      fonts:
+        - asset: assets/fonts/CherryBombOne-Regular.ttf

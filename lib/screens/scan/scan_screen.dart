@@ -225,13 +225,6 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Scannen',
-          style: TextStyle(fontFamily: 'Sniglet'),
-        ),
-        backgroundColor: Colors.green[700],
-      ),
       body: Stack(
         children: [
           // Camera fills the entire screen
@@ -239,7 +232,7 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
             child: _buildCameraPreview(),
           ),
           
-          // Semi-transparent overlay (optional, for better text readability)
+          // Semi-transparent overlay
           Positioned.fill(
             child: Container(
               color: Colors.black.withOpacity(0.2),
@@ -251,42 +244,56 @@ class _ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Spacer(),
-                  // Button now placed above the text
-                  ElevatedButton(
-                    onPressed: _isCameraInitialized ? _toggleScan : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[700],
-                      padding: const EdgeInsets.all(16),
-                      shape: const CircleBorder(),
-                      elevation: 8,
-                    ),
-                    child: Icon(
-                      _isScanning ? Icons.stop_rounded : Icons.camera_alt_rounded,
-                      size: 36,
+                  // Back button
+                  IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_ios_rounded,
                       color: Colors.white,
                     ),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
-                  const SizedBox(height: 16),
-                  // Text now appears below the button
-                  const Text(
-                    'Richt je camera op een voorwerp in de natuur',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontFamily: 'Sniglet',
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          offset: Offset(1.0, 1.0),
-                          blurRadius: 3.0,
-                          color: Color.fromARGB(255, 0, 0, 0),
+                  const Spacer(),
+                  // Center the button and text
+                  Center(
+                    child: Column(
+                      children: [
+                        ElevatedButton(
+                          onPressed: _isCameraInitialized ? _toggleScan : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green[700],
+                            padding: const EdgeInsets.all(16),
+                            shape: const CircleBorder(),
+                            elevation: 8,
+                          ),
+                          child: Icon(
+                            _isScanning ? Icons.stop_rounded : Icons.camera_alt_rounded,
+                            size: 36,
+                            color: Colors.white,
+                          ),
                         ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Richt je camera op een voorwerp in de natuur',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'Sniglet',
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                offset: Offset(1.0, 1.0),
+                                blurRadius: 3.0,
+                                color: Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 40),
                       ],
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 40),
                 ],
               ),
             ),

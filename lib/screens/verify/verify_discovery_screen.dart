@@ -26,7 +26,8 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
   bool _isSaving = false;
   int _pointsValue = 0;
   String _description = "";
-  bool _isNewDiscovery = true; // New state variable to track if this is a new discovery
+  bool _isNewDiscovery = true;
+  bool _isExpanded = false;
   final MissionService _missionService = MissionService();
 
   @override
@@ -89,7 +90,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
         });
       } else {
         // Species not found in database - use default values
-        // Still check if user already discovered it
+        // check if user already discovered it
         int adjustedPoints = alreadyDiscovered ? 1 : 5; // 1/4 of default 5 = ~1
         
         setState(() {
@@ -106,7 +107,6 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
         _isLoading = false;
         _pointsValue = 5;
         _description = "Er is een fout opgetreden bij het ophalen van informatie over ${widget.speciesName}.";
-        // Assuming it's new if we can't check
         _isNewDiscovery = true;
       });
     }
@@ -185,15 +185,21 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
       // Update missions if this is a new discovery
       if (_isNewDiscovery) {
         await _missionService.updateMissionsForDiscovery(widget.category, widget.speciesName);
+        // Show mission progress dialog
+        await _showMissionProgressDialog(widget.category);
       }
       
       // Show success message with different text based on whether it's a new discovery
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_isNewDiscovery 
-              ? 'Nieuwe ontdekking succesvol opgeslagen!'
-              : 'Je hebt ${_pointsValue} punten ontvangen!'
+            content: Text(
+              _isNewDiscovery 
+                ? 'Nieuwe ontdekking succesvol opgeslagen!'
+                : 'Je hebt ${_pointsValue} punten ontvangen!',
+              style: const TextStyle(
+                fontFamily: 'Sniglet',
+              ),
             ),
             backgroundColor: Colors.green[700],
           )
@@ -221,16 +227,115 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
     }
   }
 
+  Future<void> _showMissionProgressDialog(String category) async {
+    // Get missions that match the category
+    final missions = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('missions')
+        .where('type', whereIn: [
+          if (category.toLowerCase().contains('boom')) 'Boom',
+          if (category.toLowerCase().contains('dier') ||
+              category.toLowerCase().contains('vogel') ||
+              category.toLowerCase().contains('insect')) 'Dier',
+          if (category.toLowerCase().contains('plant')) 'Plant',
+        ])
+        .get();
+
+    if (!mounted || missions.docs.isEmpty) return;
+
+    OverlayEntry overlayEntry = OverlayEntry(
+      builder: (context) => Material(
+        color: Colors.black54,
+        child: Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Missie Voortgang',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontFamily: 'Sniglet',
+                    color: Color(0xFF4785D2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ...missions.docs.map((doc) {
+                  final data = doc.data();
+                  final progress = data['progress'] as int;
+                  final total = data['total'] as int;
+                  final title = data['title'] as String;
+                  final completed = progress >= total;
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'Sniglet',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TweenAnimationBuilder(
+                          duration: const Duration(milliseconds: 1000),
+                          tween: Tween<double>(
+                            begin: (progress - 1) / total,
+                            end: progress / total,
+                          ),
+                          builder: (context, double value, child) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                LinearProgressIndicator(
+                                  value: value,
+                                  backgroundColor: Colors.grey[300],
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    completed ? Colors.amber : Colors.green[700]!,
+                                  ),
+                                  minHeight: 10,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '$progress/$total',
+                                  style: const TextStyle(fontFamily: 'Sniglet'),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Insert overlay and remove after animation
+    Overlay.of(context).insert(overlayEntry);
+    
+    // Wait for animation and a bit more before removing
+    await Future.delayed(const Duration(milliseconds: 2000));
+    overlayEntry.remove();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Ontdekking Verifiëren',
-          style: TextStyle(fontFamily: 'Sniglet'),
-        ),
-        backgroundColor: Colors.green[700],
-      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -242,7 +347,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 0),
             child: _isLoading
               ? Center(
                   child: Column(
@@ -287,22 +392,20 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                   )
                 : SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Add this to align all child widgets to the left
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Add congratulatory text at the top with larger font
                       Align(
                         alignment: Alignment.center,
                         child: Text(
                           "Proficiat!",
                           style: TextStyle(
                             fontSize: 40,
-                            fontWeight: FontWeight.bold,
+                            fontFamily: 'CherryBombOne',
                             color: Colors.green[800],
                           ),
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Dynamic message - keep centered
                       Align(
                         alignment: Alignment.center,
                         child: Text(
@@ -316,7 +419,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                           style: TextStyle(
                             fontSize: 22,
                             fontFamily: 'Sniglet',
-                            color: Color(0xFF4785D2), // Changed to the requested color #4785D2
+                            color: Color(0xFF4785D2),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -356,12 +459,11 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Points row with better alignment
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     const SizedBox(
-                                      width: 40, // Fixed width container for icon
+                                      width: 40,
                                       child: Icon(
                                         Icons.star,
                                         color: Colors.amber,
@@ -371,7 +473,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                                     Text(
                                       "$_pointsValue punten",
                                       style: const TextStyle(
-                                        fontSize: 26,
+                                        fontSize: 22,
                                         fontFamily: 'Sniglet',
                                       ),
                                     ),
@@ -380,20 +482,19 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                                 
                                 const SizedBox(height: 12),
                                 
-                                // Discovery count row with matching alignment
                                 if (_isNewDiscovery)
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
-                                        width: 40, // Same fixed width as above
+                                        width: 40,
                                         child: Icon(
                                           widget.category.toLowerCase().contains("dier") || 
                                           widget.category.toLowerCase().contains("vogel") || 
                                           widget.category.toLowerCase().contains("insect") ? 
                                             Icons.pets : Icons.eco,
                                           color: Color(0xFF4785D2),
-                                          size: 32, // Slightly adjusted
+                                          size: 32,
                                         ),
                                       ),
                                       Text(
@@ -425,34 +526,63 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                         style: TextStyle(
                           fontSize: 32,
                           fontFamily: 'Sniglet',
-                          color: Color(0xFF4785D2), // Changed to the requested color #4785D2
+                          color: Color(0xFF4785D2),
                         ),
-                        // No need for textAlign when parent column is left-aligned
                       ),
                       
                       const SizedBox(height: 10),
                       
-                      // Left-align the description text (removed the Align wrapper)
-                      Text(
-                        _description,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontFamily: 'Sniglet',
-                          color: Colors.grey[800],
-                        ),
-                        // Removed textAlign: TextAlign.center
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: _isExpanded ? double.infinity : 80,
+                            ),
+                            child: SingleChildScrollView(
+                              physics: _isExpanded 
+                                ? const AlwaysScrollableScrollPhysics() 
+                                : const NeverScrollableScrollPhysics(),
+                              child: Text(
+                                _description,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontFamily: 'Sniglet',
+                                  color: Colors.grey[800],
+                                ),
+                                maxLines: _isExpanded ? null : 4,
+                                overflow: _isExpanded ? TextOverflow.visible : TextOverflow.fade,
+                              ),
+                            ),
+                          ),
+                          if (_description.length > 100) // Only show if text is long
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isExpanded = !_isExpanded;
+                                });
+                              },
+                              child: Text(
+                                _isExpanded ? 'Minder' : 'Meer',
+                                style: TextStyle(
+                                  color: Colors.green[700],
+                                  fontFamily: 'Sniglet',
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                       
                       const SizedBox(height: 10),
                       
-                      // Center the button
                       Align(
                         alignment: Alignment.center,
                         child: ElevatedButton(
-                          onPressed: _saveDiscovery, // Changed from navigation to saving function
+                          onPressed: _saveDiscovery,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green[600],
-                            padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 18), // Increased padding
+                            padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 18),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -461,7 +591,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                             'Ontdekking Opslaan',
                             style: TextStyle(
                               fontFamily: 'Sniglet',
-                              fontSize: 22, // Increased from 18
+                              fontSize: 22,
                               color: Colors.white,
                             ),
                           ),

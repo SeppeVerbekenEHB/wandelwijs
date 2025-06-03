@@ -113,11 +113,15 @@ class MissionService {
         .where('speciesName', isEqualTo: speciesName)
         .get();
 
+    // Get the discovery ID from the most recent discovery
+    String? discoveryId = discoveriesSnapshot.docs.isNotEmpty ? 
+        discoveriesSnapshot.docs.first.id : null;
+
     // If more than one result, this is not a new unique species (just re-discovered)
     bool isNewUniqueSpecies = discoveriesSnapshot.docs.length <= 1;
 
-    // If it's not a new unique species, don't update missions
-    if (!isNewUniqueSpecies) return;
+    // If it's not a new unique species or no discovery ID, don't update missions
+    if (!isNewUniqueSpecies || discoveryId == null) return;
 
     // Initialize a batch for all updates
     final batch = _firestore.batch();
@@ -160,10 +164,15 @@ class MissionService {
           totalPointsToAdd += mission.reward;
         }
 
-        // Update the mission
+        // Add the discovery ID to the mission's list
+        List<String> updatedDiscoveryIds = List<String>.from(mission.discoveryIds)
+          ..add(discoveryId);
+
+        // Update the mission with new progress and discovery ID
         batch.update(doc.reference, {
           'progress': newProgress,
           'completed': newCompleted,
+          'discoveryIds': updatedDiscoveryIds,
         });
       }
     }
