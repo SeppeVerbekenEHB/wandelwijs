@@ -70,6 +70,10 @@ flutter:
     - assets/images/Mushroom.png
     - assets/images/Flower.png
     - assets/images/Bee.png
+    - assets/images/Cat_Profile.png
+    - assets/images/Dino_Profile.png
+    - assets/images/Flower_Profile.png
+    - assets/images/Robot_Profile.png
     - .env
 
   fonts:

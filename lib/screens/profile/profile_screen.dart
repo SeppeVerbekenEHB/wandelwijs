@@ -16,12 +16,14 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   int _discoveryCount = 0;
   int _completedMissionsCount = 0;
+  String _selectedProfilePicture = 'assets/images/Cat_Profile.png';
 
   @override
   void initState() {
     super.initState();
     _loadDiscoveryCount();
     _loadCompletedMissionsCount();
+    _loadProfilePicture();
   }
 
   Future<void> _loadDiscoveryCount() async {
@@ -58,6 +60,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _completedMissionsCount = missions.docs.length;
       });
     }
+  }
+
+  Future<void> _loadProfilePicture() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      
+      setState(() {
+        _selectedProfilePicture = userData.data()?['profilePicture'] ?? 'assets/images/Cat_Profile.png';
+      });
+    }
+  }
+
+  Future<void> _updateProfilePicture(String picturePath) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set({'profilePicture': picturePath}, SetOptions(merge: true));
+      
+      setState(() {
+        _selectedProfilePicture = picturePath;
+      });
+    }
+  }
+
+  void _showProfilePictureDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Kies een profielfoto', 
+            style: TextStyle(fontFamily: 'Sniglet'),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildProfilePictureOption('assets/images/Cat_Profile.png', 'Kat'),
+                _buildProfilePictureOption('assets/images/Dino_Profile.png', 'Dino'),
+                _buildProfilePictureOption('assets/images/Flower_Profile.png', 'Bloem'),
+                _buildProfilePictureOption('assets/images/Robot_Profile.png', 'Robot'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProfilePictureOption(String imagePath, String name) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: AssetImage(imagePath),
+      ),
+      title: Text(name, style: const TextStyle(fontFamily: 'Sniglet')),
+      onTap: () {
+        _updateProfilePicture(imagePath);
+        Navigator.pop(context);
+      },
+    );
   }
 
   User? _getUser() {
@@ -97,10 +164,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.green,
-                      child: Icon(Icons.person, size: 50, color: Colors.white),
+                    GestureDetector(
+                      onTap: _showProfilePictureDialog,
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundImage: AssetImage(_selectedProfilePicture),
+                        backgroundColor: Colors.green,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Text(
