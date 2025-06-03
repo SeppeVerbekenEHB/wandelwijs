@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../screens/auth.dart';
 import '../missions/missions_screen.dart';
 import '../album/album_screen.dart';
@@ -13,6 +14,34 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  int _discoveryCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDiscoveryCount();
+  }
+
+  Future<void> _loadDiscoveryCount() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final discoveries = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('discoveries')
+          .get();
+
+      // Create a set of unique species names
+      final uniqueSpecies = discoveries.docs
+          .map((doc) => doc.data()['speciesName'] as String)
+          .toSet();
+
+      setState(() {
+        _discoveryCount = uniqueSpecies.length;
+      });
+    }
+  }
+
   User? _getUser() {
     return Auth().currentUser;
   }
@@ -81,10 +110,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: Text('Voltooide Missies', style: TextStyle(fontFamily: 'Sniglet')),
                       trailing: Text('0', style: TextStyle(fontFamily: 'Sniglet')),
                     ),
-                    const ListTile(
-                      leading: Icon(Icons.photo_album, color: Colors.green),
-                      title: Text('Verzamelde Items', style: TextStyle(fontFamily: 'Sniglet')),
-                      trailing: Text('0', style: TextStyle(fontFamily: 'Sniglet')),
+                    ListTile(
+                      leading: const Icon(Icons.photo_album, color: Colors.green),
+                      title: const Text('Ontdekkingen', style: TextStyle(fontFamily: 'Sniglet')),
+                      trailing: Text(
+                        '$_discoveryCount',
+                        style: const TextStyle(fontFamily: 'Sniglet')
+                      ),
                     ),
                   ],
                 ),
