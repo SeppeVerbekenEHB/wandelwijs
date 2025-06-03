@@ -42,12 +42,16 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
   
   Future<void> _analyzeImage() async {
     try {
+      print('Starting image analysis...');
       final apiKey = ApiConfig.openaiApiKey;
+      print('API Key available: ${apiKey.isNotEmpty}');
       
       // Convert image file to base64
       final bytes = await widget.imageFile.readAsBytes();
       final base64Image = base64Encode(bytes);
+      print('Image converted to base64');
       
+      print('Sending request to OpenAI API...');
       final response = await http.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
@@ -86,15 +90,20 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
         }),
       );
       
+      print('Response received. Status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final content = jsonResponse['choices'][0]['message']['content'];
+        print('Parsed content: $content');
         
         // Parse the result to extract species name and type
         String speciesName = 'Niet herkend';
         String speciesType = '';
         
         if (content != null && content.isNotEmpty) {
+          print('Processing content...');
           // Extract from format "SpeciesName - Type"
           final lines = content.split('\n');
           if (lines.isNotEmpty) {
@@ -102,12 +111,15 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
             if (parts.length >= 2) {
               speciesName = parts[0].trim();
               speciesType = parts[1].trim();
+              print('Parsed species: $speciesName, type: $speciesType');
             } else {
               speciesName = lines[0].trim();
+              print('Only species name found: $speciesName');
             }
           }
         }
         
+        print('Setting state with: speciesName=$speciesName, type=$speciesType');
         setState(() {
           _isLoading = false;
           _result = content;
@@ -115,17 +127,19 @@ class _AnalyzeImageScreenState extends State<AnalyzeImageScreen> with SingleTick
           _speciesType = speciesType;
         });
       } else {
+        print('Error response from API');
         setState(() {
           _isLoading = false;
           _result = "Error: ${response.statusCode} - ${response.body}";
         });
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('Error in _analyzeImage: $e');
+      print('Stack trace: $stackTrace');
       setState(() {
         _isLoading = false;
         _result = "An error occurred: $e";
       });
-      print("Error details: $e");
     }
   }
   
