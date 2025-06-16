@@ -473,7 +473,7 @@ class _VerifyDiscoveryScreenState extends State<VerifyDiscoveryScreen> {
                                     Text(
                                       "$_pointsValue punten",
                                       style: const TextStyle(
-                                        fontSize: 22,
+                                        fontSize: 20,
                                         fontFamily: 'Sniglet',
                                       ),
                                     ),
